@@ -1,0 +1,3 @@
+git+https://github.com/astronomy-commons/hipscat.git@main
+git+https://github.com/astronomy-commons/lsdb.git@main
+git+https://github.com/macauff/macauff.git@main
