@@ -1,8 +1,5 @@
 # Catalogue name -- used both for folder creation and output file names
 cat_name: Gaia
-#cat_folder_path: gaia_folder
-# Folder for all AUF-related files to be created in. Should be an absolute path, or relative to folder script called in.
-#auf_folder_path: gaia_auf_folder
 # Filter names are also used in any output file created
 filt_names:
   - G_BP
@@ -43,15 +40,6 @@ gal_al_avs:
 auf_region_type: rectangle
 # Frame of the coordinates must be specified -- either "equatorial" or "galactic"
 auf_region_frame: equatorial
-# For "points" this should be individually specified (ra, dec) or (l, b) coordinates [as "(a, b), (c, d)"]
-# For "rectangle" this should be 6 numbers: start coordinate, end coordinate, integer number of data points from start to end (inclusive of both start and end), first for ra/l, then for dec/b (depending on auf_region_type), all separated by spaces
-#auf_region_points:
-#  - 131
-#  - 134
-#  - 4
-#  - -1
-#  - 1
-#  - 3
 # Local density calculation radius, in degrees
 dens_dist: 0.25
 # Test for whether we need to correct astrometry of catalogue for systematic biases before performing matches

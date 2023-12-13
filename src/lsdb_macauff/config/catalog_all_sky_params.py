@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List
 
 
-# pylint: disable=too-many-instance-attributes)
+# pylint: disable=too-many-instance-attributes
 @dataclass
 class CatalogAllSkyParams:
     """Catalog-dependent sky parameters"""
