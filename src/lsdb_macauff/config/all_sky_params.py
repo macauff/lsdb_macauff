@@ -11,7 +11,6 @@ class AllSkyParams:
     include_perturb_auf: bool
     include_phot_like: bool
     use_phot_priors: bool
-    cross_match_extent: List[float]
     pos_corr_dist: float
     cf_region_type: str
     cf_region_frame: str
