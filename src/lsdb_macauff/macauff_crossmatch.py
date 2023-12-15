@@ -37,9 +37,40 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             right_pixel_params,
         )
         # Apply astrometric corrections?
+
+        # get the dataframes
+        a_astro, a_photo, a_magref = self.make_data_arrays(
+            self.left, self.left_metadata, left_all_sky_params
+        )
+
+        all_macauff_attrs.a_astro = a_astro
+        all_macauff_attrs.a_photo = a_photo
+        all_macauff_attrs.a_magref = a_magref
+
+        b_astro, b_photo, b_magref = self.make_data_arrays(
+            self.right, self.right_metadata, right_all_sky_params
+        )
+
+        all_macauff_attrs.b_astro = b_astro
+        all_macauff_attrs.b_photo = b_photo
+        all_macauff_attrs.b_magref = b_magref
+
         macauff = Macauff(all_macauff_attrs)
         macauff()
         return self.make_joint_dataframe(all_macauff_attrs)
+
+    def make_data_arrays(self, data, metadata, params):
+        """Creates the astro, photo, and magref arrays for a given catalog's dataset."""
+        ra_column = metadata.ra_column
+        dec_column = metadata.dec_column
+        uncertainty_column = params.uncertainty_column_name
+        astro = data[[ra_column, dec_column, uncertainty_column]].to_numpy()
+
+        photo = data[params.filt_names].to_numpy()
+
+        magref = data[params.magref_column_name].to_numpy()
+
+        return astro, photo, magref
 
     def make_joint_dataframe(self, macauff_attrs: AllMacauffAttrs) -> pd.DataFrame:
         """Creates the resulting crossmatch pandas Dataframe"""
