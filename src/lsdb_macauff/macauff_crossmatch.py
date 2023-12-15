@@ -56,8 +56,8 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         all_macauff_attrs.b_photo = b_photo
         all_macauff_attrs.b_magref = b_magref
 
-        macauff = Macauff(all_macauff_attrs)
-        macauff()
+        # macauff = Macauff(all_macauff_attrs)
+        # macauff()
         return self.make_joint_dataframe(all_macauff_attrs)
 
     def make_data_arrays(self, data, metadata, params):
