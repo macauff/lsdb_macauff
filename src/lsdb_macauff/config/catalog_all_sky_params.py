@@ -15,11 +15,20 @@ class CatalogAllSkyParams:
     auf_region_frame: str
     correct_astrometry: bool
     compute_snr_mag_relation: bool
+    best_mag_index: int | None = None
+    correct_mag_array: List[float] | None = None
+    correct_mag_slice: List[float] | None = None
+    correct_sig_slice: List[float] | None = None
+    pos_and_err_indices: List[int] | None = None
+    mag_indices: List[int] | None = None
+    mag_unc_indices: List[int] | None = None
+    use_photometric_uncertainties: bool | None = None
+    nn_radius: float | None = None
     fit_gal_flag: bool | None = None
     gal_wavs: List[float] | None = None
     gal_zmax: List[float] | None = None
-    gal_nzs: int | None = None
-    gal_aboffsets: float | None = None
+    gal_nzs: List[int] | None = None
+    gal_aboffsets: List[float] | None = None
     gal_filternames: List[str] | None = None
     run_fw_auf: bool | None = None
     run_psf_auf: bool | None = None

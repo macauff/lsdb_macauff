@@ -24,3 +24,5 @@ int_fracs:
 num_trials: 10000
 # Bin size of magnitudes for number density distributions for perturbation AUF considersation
 d_mag: 0.1
+# Multiprocessing CPU count
+n_pool: 2
