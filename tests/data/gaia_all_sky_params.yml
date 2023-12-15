@@ -45,3 +45,7 @@ dens_dist: 0.25
 # Test for whether we need to correct astrometry of catalogue for systematic biases before performing matches
 correct_astrometry: no
 compute_snr_mag_relation: no
+# Astrometric uncertainty column name
+uncertainty_column_name: astro_unc
+# magref column name
+magref_column_name: magref

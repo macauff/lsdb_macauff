@@ -1,10 +1,11 @@
 import pandas as pd
-from lsdb.core.crossmatch.abstract_crossmatch_algorithm import \
-    AbstractCrossmatchAlgorithm
-from macauff.macauff import Macauff
+from lsdb.core.crossmatch.abstract_crossmatch_algorithm import AbstractCrossmatchAlgorithm
 
 from lsdb_macauff.all_macauff_attrs import AllMacauffAttrs
 from lsdb_macauff.config.pixel_params import PixelParams
+
+# from macauff.macauff import Macauff
+
 
 
 class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
@@ -61,8 +62,8 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
 
     def make_data_arrays(self, data, metadata, params):
         """Creates the astro, photo, and magref arrays for a given catalog's dataset."""
-        ra_column = metadata.ra_column
-        dec_column = metadata.dec_column
+        ra_column = metadata.catalog_info.ra_column
+        dec_column = metadata.catalog_info.dec_column
         uncertainty_column = params.uncertainty_column_name
         astro = data[[ra_column, dec_column, uncertainty_column]].to_numpy()
 
