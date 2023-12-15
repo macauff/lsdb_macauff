@@ -1,6 +1,5 @@
 import pandas as pd
-from lsdb.core.crossmatch.abstract_crossmatch_algorithm import \
-    AbstractCrossmatchAlgorithm
+from lsdb.core.crossmatch.abstract_crossmatch_algorithm import AbstractCrossmatchAlgorithm
 from macauff.macauff import Macauff
 
 from lsdb_macauff.all_macauff_attrs import AllMacauffAttrs
@@ -22,12 +21,8 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         # Calculate macauff pixel params using self.left_order,
         # self.left_pixel, self.right_order, self.right_pixel
         macauff_pixel_params = None
-        left_pixel_params = PixelParams(
-            self.left_order, self.left_pixel, left_tri_map_histogram
-        )
-        right_pixel_params = PixelParams(
-            self.right_order, self.right_pixel, right_tri_map_histogram
-        )
+        left_pixel_params = PixelParams(self.left_order, self.left_pixel, left_tri_map_histogram)
+        right_pixel_params = PixelParams(self.right_order, self.right_pixel, right_tri_map_histogram)
         all_macauff_attrs = AllMacauffAttrs(
             joint_all_sky_params,
             macauff_pixel_params,
