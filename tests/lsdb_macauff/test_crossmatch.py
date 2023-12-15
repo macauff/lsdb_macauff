@@ -1,4 +1,3 @@
-import hipscat as hc
 import pandas as pd
 import pytest
 from hipscat.catalog import Catalog
