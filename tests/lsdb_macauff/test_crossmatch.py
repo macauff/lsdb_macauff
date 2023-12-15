@@ -1,6 +1,8 @@
 import hipscat as hc
 import pandas as pd
 import pytest
+from hipscat.catalog import Catalog
+from hipscat.catalog.catalog_info import CatalogInfo
 from hipscat.pixel_math import HealpixPixel
 
 from lsdb_macauff.macauff_crossmatch import MacauffCrossmatch
@@ -12,12 +14,8 @@ def test_macauff_crossmatch(
 ):
     """We know this will fail, but that's ok for now!"""
 
-    catalog_a = hc.catalog.Catalog(
-        hc.catalog.catalog_info.CatalogInfo({"catalog_name": "catalog_a"}), [HealpixPixel(0, 0)]
-    )
-    catalog_b = hc.catalog.Catalog(
-        hc.catalog.catalog_info.CatalogInfo({"catalog_name": "catalog_b"}), [HealpixPixel(0, 0)]
-    )
+    catalog_a = Catalog(CatalogInfo({"catalog_name": "catalog_a"}), [HealpixPixel(0, 0)])
+    catalog_b = Catalog(CatalogInfo({"catalog_name": "catalog_b"}), [HealpixPixel(0, 0)])
 
     algo = MacauffCrossmatch(
         left=pd.read_csv(catalog_a_csv),
