@@ -30,7 +30,7 @@ def test_macauff_crossmatch(
     algo.crossmatch(all_sky_params, gaia_all_sky_params, wise_all_sky_params, None, None)
 
 def test_make_data_arrays(
-        catalog_a_csv, catalog_b_csv, all_sky_params, gaia_all_sky_params, wise_all_sky_params
+        catalog_a_csv, catalog_b_csv, gaia_all_sky_params, wise_all_sky_params
 ):
     """Ensure that we can get the astro, photo, and magref arrays for each catalog."""
     # target lengths
