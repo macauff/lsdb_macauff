@@ -16,6 +16,9 @@ classifiers = [
 ]
 dynamic = ["version"]
 dependencies = [
+    "lsdb",
+    "macauff",
+    "pandas",
 ]
 
 # On a mac, install optional dependencies with `pip install '.[dev]'` (include the single quotes)
