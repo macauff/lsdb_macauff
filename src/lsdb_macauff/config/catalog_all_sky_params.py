@@ -11,6 +11,8 @@ class CatalogAllSkyParams:
 
     cat_name: str
     filt_names: List[str]
+    uncertainty_column_name: str
+    magref_column_name: str
     auf_region_type: str
     auf_region_frame: str
     correct_astrometry: bool

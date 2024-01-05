@@ -1,0 +1,8 @@
+{
+    "catalog_name": "catwise2020",
+    "catalog_type": "object",
+    "total_rows": 32223,
+    "epoch": "J2000",
+    "ra_column": "ra",
+    "dec_column": "dec"
+}

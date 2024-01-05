@@ -1,15 +1,15 @@
 import healpy as hp
 import numpy as np
 import pandas as pd
-from lsdb.core.crossmatch.abstract_crossmatch_algorithm import \
-    AbstractCrossmatchAlgorithm
+from lsdb.core.crossmatch.abstract_crossmatch_algorithm import AbstractCrossmatchAlgorithm
 from macauff import AstrometricCorrections
 from macauff.fit_astrometry import SNRMagnitudeRelationship
-from macauff.macauff import Macauff
 
 from lsdb_macauff.all_macauff_attrs import AllMacauffAttrs
 from lsdb_macauff.config import CatalogAllSkyParams
 from lsdb_macauff.config.pixel_params import PixelParams
+
+# from macauff.macauff import Macauff
 
 
 class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
@@ -27,13 +27,9 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         # Calculate macauff pixel params using self.left_order,
         # self.left_pixel, self.right_order, self.right_pixel
         macauff_pixel_params = None
-        left_pixel_params = PixelParams(
-            self.left_order, self.left_pixel, left_tri_map_histogram
-        )
-        right_pixel_params = PixelParams(
-            self.right_order, self.right_pixel, right_tri_map_histogram
-        )
-        self.all_macauff_attrs = AllMacauffAttrs(
+        left_pixel_params = PixelParams(self.left_order, self.left_pixel, left_tri_map_histogram)
+        right_pixel_params = PixelParams(self.right_order, self.right_pixel, right_tri_map_histogram)
+        all_macauff_attrs = AllMacauffAttrs(
             joint_all_sky_params,
             macauff_pixel_params,
             left_all_sky_params,
@@ -41,10 +37,42 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             left_pixel_params,
             right_pixel_params,
         )
+
         self._correct_astrometry()
-        macauff = Macauff(self.all_macauff_attrs)
-        macauff()
+
+        # get the dataframes
+        a_astro, a_photo, a_magref = self.make_data_arrays(self.left, self.left_metadata, left_all_sky_params)
+
+        all_macauff_attrs.a_astro = a_astro
+        all_macauff_attrs.a_photo = a_photo
+        all_macauff_attrs.a_magref = a_magref
+
+        b_astro, b_photo, b_magref = self.make_data_arrays(
+            self.right, self.right_metadata, right_all_sky_params
+        )
+
+        all_macauff_attrs.b_astro = b_astro
+        all_macauff_attrs.b_photo = b_photo
+        all_macauff_attrs.b_magref = b_magref
+
+        self.all_macauff_attrs = all_macauff_attrs
+
+        # macauff = Macauff(self.all_macauff_attrs)
+        # macauff()
         return self._make_joint_dataframe()
+
+    def make_data_arrays(self, data, metadata, params):
+        """Creates the astro, photo, and magref arrays for a given catalog's dataset."""
+        ra_column = metadata.catalog_info.ra_column
+        dec_column = metadata.catalog_info.dec_column
+        uncertainty_column = params.uncertainty_column_name
+        astro = data[[ra_column, dec_column, uncertainty_column]].to_numpy()
+
+        photo = data[params.filt_names].to_numpy()
+
+        magref = data[params.magref_column_name].to_numpy()
+
+        return astro, photo, magref
 
     def _get_astrometry_parameters(self):
         dataframes = [self.left, self.right]
@@ -80,11 +108,11 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
                     coord_or_chunk,
                 )
                 # Retrieve the function to apply the corrections
-                new_uncertainties = self.apply_corrections(m_sigs, n_sigs)
+                new_uncertainties = self._apply_corrections(m_sigs, n_sigs)
                 dataframe.assign(uncertainty=new_uncertainties)
             else:
                 smr, _, _ = SNRMagnitudeRelationship(
-                    catalog_sky_params.correct_astro_save_folder, # This one does not exist
+                    catalog_sky_params.correct_astro_save_folder,  # This one does not exist
                     ax1_mids,
                     ax2_mids,
                     ax_dimension,
@@ -95,7 +123,7 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
                     catalog_sky_params.mag_unc_indices,
                     catalog_sky_params.filt_names,
                     catalog_sky_params.auf_region_frame,
-                    chunks=[self.chunk_id], # Check if this id is related to the trilegal download
+                    chunks=[self.chunk_id],  # Check if this id is related to the trilegal download
                 )
             catalog_sky_params.snr_mag_params = smr
 
@@ -114,9 +142,9 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             self.all_macauff_attrs.macauff_all_sky_params.num_trials,
             catalog_sky_params.nn_radius,
             catalog_sky_params.dens_dist,
-            catalog_sky_params.correct_astro_save_folder, # This one does not exist
+            catalog_sky_params.correct_astro_save_folder,  # This one does not exist
             catalog_sky_params.auf_folder_path,  # Used to be in catalog, but was removed
-            '{}/{}/trilegal_auf_simulation',  # (correct_astro_tri_name): confirm
+            "{}/{}/trilegal_auf_simulation",  # (correct_astro_tri_name): confirm
             catalog_sky_params.tri_maglim_faint,
             catalog_sky_params.tri_filt_num,
             catalog_sky_params.tri_num_faint,
@@ -146,13 +174,16 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             catalog_sky_params.auf_region_frame,
             use_photometric_uncertainties=catalog_sky_params.use_photometric_uncertainties,
             pregenerate_cutouts=True,
-            chunks=[self.chunk_id], # Check if this id is related to the trilegal download
+            chunks=[self.chunk_id],  # Check if this id is related to the trilegal download
             n_r=self.all_macauff_attrs.macauff_all_sky_params.real_hankel_points,
             n_rho=self.all_macauff_attrs.macauff_all_sky_params.four_hankel_points,
             max_rho=self.all_macauff_attrs.macauff_all_sky_params.four_max_rho,
             return_nm=True,
         )
         return m_sigs, n_sigs, abc_array
+
+    def _apply_corrections(self):
+        return
 
     def _make_joint_dataframe(self) -> pd.DataFrame:
         """Creates the resulting crossmatch pandas Dataframe"""
