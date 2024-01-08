@@ -61,7 +61,7 @@ def dask_client():
     client.close()
 
 
-def pytest_collection_modifyitems(_, items):
+def pytest_collection_modifyitems(items):
     """Modify dask unit tests to
         - ignore event loop deprecation warnings
         - have a longer timeout default timeout (5 seconds instead of 1 second)
