@@ -44,6 +44,9 @@ write_to = "src/lsdb_macauff/_version.py"
 testpaths = [
     "tests",
 ]
+markers = [
+    "dask: mark tests as having a dask client runtime dependency",
+]
 
 [tool.coverage.run]
 omit=["src/lsdb_macauff/_version.py"]

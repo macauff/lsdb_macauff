@@ -1,0 +1,37 @@
+---
+name: catalog_a_b_matches
+description: Match and non-match table for catalog_a and catalog_b
+tables:
+- name: catalog_a_b_matches
+  "@id": "#catalog_a_b_matches"
+  description: Counterpart associations between catalog_a and catalog_b, as well as derived values from the cross-match process such as match probability and contamination flux.
+  columns:
+  - name: catalog_a_id
+    "@id": "#catalog_a_b_matches.catalog_a_id"
+    datatype: string
+    description: The object ID in catalog_a.
+  - name: catalog_a_ra
+    "@id": "#catalog_a_b_matches.catalog_a_ra"
+    datatype: double
+    description: Right Ascension of the catalog_asource.
+  - name: catalog_a_dec
+    "@id": "#catalog_a_b_matches.catalog_a_dec"
+    datatype: double
+    description: The catalog_a declination.
+  - name: catalog_b_name
+    "@id": "#catalog_a_b_matches.catalog_b_name"
+    datatype: string
+    description: The object identifier from the catalog_b catalogue.
+  - name: catalog_b_ra
+    "@id": "#catalog_a_b_matches.catalog_b_ra"
+    datatype: double
+    description: Right Ascension of the object as quoted by the catalog_b catalogue.
+  - name: catalog_b_dec
+    "@id": "#catalog_a_b_matches.catalog_b_dec"
+    datatype: double
+    description: catalog_b Declination.
+  - name: match_p
+    "@id": "#catalog_a_b_matches.match_p"
+    datatype: double
+    description: Overall probability that the catalog_a and catalog_b sources are detections of the same object, as given by equation 26 of Wilson & Naylor (2018a).
+  primaryKey: "#catalog_a_b_matches.catalog_a_id"
