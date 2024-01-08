@@ -25,11 +25,46 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         left_tri_map_histogram,
         right_tri_map_histogram,
     ) -> pd.DataFrame:
+        self._load_all_macauff_attrs(
+            joint_all_sky_params,
+            left_all_sky_params,
+            right_all_sky_params,
+            left_tri_map_histogram,
+            right_tri_map_histogram,
+        )
+        # Apply preprocessing operations to the left and right catalogs
+        self._process_astrometry(
+            self.left,
+            self.all_macauff_attrs.a_astro,
+            self.all_macauff_attrs.left_all_sky_params,
+            self.left_order,
+            self.left_pixel,
+        )
+        self._process_astrometry(
+            self.right,
+            self.all_macauff_attrs.b_astro,
+            self.all_macauff_attrs.right_all_sky_params,
+            self.right_order,
+            self.right_pixel,
+        )
+        macauff = Macauff(self.all_macauff_attrs)
+        macauff()
+        return self._make_joint_dataframe()
+
+    def _load_all_macauff_attrs(
+        self,
+        joint_all_sky_params,
+        left_all_sky_params,
+        right_all_sky_params,
+        left_tri_map_histogram,
+        right_tri_map_histogram,
+    ):
         # Calculate macauff pixel params
         macauff_pixel_params = None
         left_pixel_params = PixelParams(self.left_order, self.left_pixel, left_tri_map_histogram)
         right_pixel_params = PixelParams(self.right_order, self.right_pixel, right_tri_map_histogram)
-        self.all_macauff_attrs = AllMacauffAttrs(
+
+        all_macauff_attrs = AllMacauffAttrs(
             joint_all_sky_params,
             macauff_pixel_params,
             left_all_sky_params,
@@ -37,10 +72,22 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             left_pixel_params,
             right_pixel_params,
         )
-        self._preprocess_catalogs()
-        macauff = Macauff(self.all_macauff_attrs)
-        macauff()
-        return self._make_joint_dataframe()
+
+        a_astro, a_photo, a_magref = self.make_data_arrays(
+            self.left, self.left_metadata, all_macauff_attrs.left_all_sky_params
+        )
+        all_macauff_attrs.a_astro = a_astro
+        all_macauff_attrs.a_photo = a_photo
+        all_macauff_attrs.a_magref = a_magref
+
+        b_astro, b_photo, b_magref = self.make_data_arrays(
+            self.right, self.right_metadata, all_macauff_attrs.right_all_sky_params
+        )
+        all_macauff_attrs.b_astro = b_astro
+        all_macauff_attrs.b_photo = b_photo
+        all_macauff_attrs.b_magref = b_magref
+
+        self.all_macauff_attrs = all_macauff_attrs
 
     def make_data_arrays(self, data, metadata, params):
         """Creates the astro, photo, and magref arrays for a given catalog's dataset."""
@@ -51,25 +98,6 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         photo = data[params.filt_names].to_numpy()
         magref = data[params.magref_column_name].to_numpy()
         return astro, photo, magref
-
-    def _preprocess_catalogs(self):
-        """Applies preprocessing operations to the left and right catalogs"""
-        a_astro, a_photo, a_magref = self.make_data_arrays(
-            self.left, self.left_metadata, self.all_macauff_attrs.left_all_sky_params
-        )
-        self._process_astrometry(
-            self.left, a_astro, self.all_macauff_attrs.left_all_sky_params, self.left_order, self.left_pixel
-        )
-        b_astro, b_photo, b_magref = self.make_data_arrays(
-            self.right, self.right_metadata, self.all_macauff_attrs.right_all_sky_params
-        )
-        self._process_astrometry(
-            self.right,
-            b_astro,
-            self.all_macauff_attrs.right_all_sky_params,
-            self.right_order,
-            self.right_pixel,
-        )
 
     def _process_astrometry(
         self,
