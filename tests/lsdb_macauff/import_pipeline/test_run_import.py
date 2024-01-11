@@ -33,7 +33,7 @@ def test_object_to_object(
     import_match_csv,
     dask_client,
 ):
-    """Test that we can create a MacauffArguments instance with two valid catalogs."""
+    """Test that we can create an association catalog by running the Macauff import pipeline."""
 
     from_yaml(import_metadata_yaml, tmp_path)
     matches_schema_file = os.path.join(tmp_path, "catalog_a_b_matches.parquet")
