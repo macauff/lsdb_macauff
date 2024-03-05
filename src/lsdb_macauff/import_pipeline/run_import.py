@@ -2,6 +2,7 @@ import healpy as hp
 import numpy as np
 from hipscat.catalog import Catalog
 from hipscat.io import file_io, parquet_metadata, paths, write_metadata
+from hipscat.catalog.association_catalog.partition_join_info import PartitionJoinInfo
 from tqdm import tqdm
 
 from lsdb_macauff.import_pipeline.arguments import MacauffArguments
@@ -135,8 +136,8 @@ def run(args, client):
         metadata_path = paths.get_parquet_metadata_pointer(args.catalog_path)
         for row_group in parquet_metadata.read_row_group_fragments(metadata_path):
             total_rows += row_group.num_rows
-        # pylint: disable=duplicate-code
-        # Very similar to /index/run_index.py
+        partition_join_info = PartitionJoinInfo.read_from_file(metadata_path)
+        partition_join_info.write_to_csv(catalog_path=args.catalog_path)
         step_progress.update(1)
         total_rows = int(total_rows)
         catalog_info = args.to_catalog_info(total_rows)

@@ -61,7 +61,6 @@ def test_object_to_object(
         metadata_file_path=matches_schema_file,
         progress_bar=False,
     )
-    os.makedirs(os.path.join(args.tmp_path, "splitting"))
 
     runner.run(args, dask_client)
 
