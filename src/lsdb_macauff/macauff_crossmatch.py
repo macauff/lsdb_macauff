@@ -7,7 +7,6 @@ from lsdb_macauff.config.pixel_params import PixelParams
 # from macauff.macauff import Macauff
 
 
-
 class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
     """Class that runs the Macauff crossmatch"""
 
@@ -23,12 +22,8 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         # Calculate macauff pixel params using self.left_order,
         # self.left_pixel, self.right_order, self.right_pixel
         macauff_pixel_params = None
-        left_pixel_params = PixelParams(
-            self.left_order, self.left_pixel, left_tri_map_histogram
-        )
-        right_pixel_params = PixelParams(
-            self.right_order, self.right_pixel, right_tri_map_histogram
-        )
+        left_pixel_params = PixelParams(self.left_order, self.left_pixel, left_tri_map_histogram)
+        right_pixel_params = PixelParams(self.right_order, self.right_pixel, right_tri_map_histogram)
         all_macauff_attrs = AllMacauffAttrs(
             joint_all_sky_params,
             macauff_pixel_params,
@@ -40,9 +35,7 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         # Apply astrometric corrections?
 
         # get the dataframes
-        a_astro, a_photo, a_magref = self.make_data_arrays(
-            self.left, self.left_metadata, left_all_sky_params
-        )
+        a_astro, a_photo, a_magref = self.make_data_arrays(self.left, self.left_metadata, left_all_sky_params)
 
         all_macauff_attrs.a_astro = a_astro
         all_macauff_attrs.a_photo = a_photo

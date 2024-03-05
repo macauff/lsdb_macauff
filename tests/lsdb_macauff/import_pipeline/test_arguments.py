@@ -1,6 +1,5 @@
 """Tests of macauff arguments"""
 
-
 from os import path
 
 import pytest
