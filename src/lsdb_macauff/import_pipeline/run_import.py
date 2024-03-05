@@ -1,8 +1,8 @@
 import healpy as hp
 import numpy as np
 from hipscat.catalog import Catalog
-from hipscat.io import file_io, parquet_metadata, paths, write_metadata
 from hipscat.catalog.association_catalog.partition_join_info import PartitionJoinInfo
+from hipscat.io import file_io, parquet_metadata, paths, write_metadata
 from tqdm import tqdm
 
 from lsdb_macauff.import_pipeline.arguments import MacauffArguments
