@@ -26,12 +26,12 @@ def test_macauff_crossmatch(
         left_metadata=catalog_a,
         right_metadata=catalog_b,
         suffixes=("a", "b"),
+        right_margin_hc_structure=None,
     )
     algo.crossmatch(all_sky_params, gaia_all_sky_params, wise_all_sky_params, None, None)
 
-def test_make_data_arrays(
-        catalog_a_csv, catalog_b_csv, gaia_all_sky_params, wise_all_sky_params
-):
+
+def test_make_data_arrays(catalog_a_csv, catalog_b_csv, gaia_all_sky_params, wise_all_sky_params):
     """Ensure that we can get the astro, photo, and magref arrays for each catalog."""
     # target lengths
     a_expected_len = len(pd.read_csv(catalog_a_csv))
@@ -53,15 +53,12 @@ def test_make_data_arrays(
         left_metadata=catalog_a,
         right_metadata=catalog_b,
         suffixes=("a", "b"),
+        right_margin_hc_structure=None,
     )
 
-    a_astro, a_photo, a_magref = algo.make_data_arrays(
-        algo.left, algo.left_metadata, gaia_all_sky_params
-    )
+    a_astro, a_photo, a_magref = algo.make_data_arrays(algo.left, algo.left_metadata, gaia_all_sky_params)
 
-    b_astro, b_photo, b_magref = algo.make_data_arrays(
-        algo.right, algo.right_metadata, wise_all_sky_params
-    )
+    b_astro, b_photo, b_magref = algo.make_data_arrays(algo.right, algo.right_metadata, wise_all_sky_params)
 
     assert a_astro.shape == (a_expected_len, 3)
     assert a_photo.shape == (a_expected_len, len(gaia_all_sky_params.filt_names))

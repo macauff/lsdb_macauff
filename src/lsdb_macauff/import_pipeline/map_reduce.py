@@ -5,7 +5,8 @@ import pyarrow.parquet as pq
 from hipscat.io import file_io, paths
 from hipscat.pixel_math.healpix_pixel import HealpixPixel
 from hipscat.pixel_math.healpix_pixel_function import get_pixel_argsort
-from hipscat_import.catalog.map_reduce import _get_pixel_directory, _iterate_input_file
+from hipscat_import.catalog.map_reduce import _iterate_input_file
+from hipscat_import.pipeline_resume_plan import get_pixel_cache_directory
 
 from lsdb_macauff.import_pipeline.resume_plan import MacauffResumePlan
 
@@ -62,7 +63,7 @@ def split_associations(
 
             filtered_data = data.filter(items=data_indexes, axis=0)
 
-            pixel_dir = _get_pixel_directory(tmp_path, pixel.order, pixel.pixel)
+            pixel_dir = get_pixel_cache_directory(tmp_path, pixel)
             file_io.make_directory(pixel_dir, exist_ok=True)
             output_file = file_io.append_paths_to_pointer(
                 pixel_dir, f"shard_{splitting_key}_{chunk_number}.parquet"
@@ -76,7 +77,7 @@ def split_associations(
 def reduce_associations(left_pixel, tmp_path, catalog_path, reduce_key):
     """For all points determined to be in the target left_pixel, map them to the appropriate right_pixel
     and aggregate into a single parquet file."""
-    inputs = _get_pixel_directory(tmp_path, left_pixel.order, left_pixel.pixel)
+    inputs = get_pixel_cache_directory(tmp_path, left_pixel)
 
     if not file_io.directory_has_contents(inputs):
         MacauffResumePlan.reducing_key_done(
