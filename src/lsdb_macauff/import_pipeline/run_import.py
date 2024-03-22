@@ -3,7 +3,7 @@ import numpy as np
 from hipscat.catalog import Catalog
 from hipscat.catalog.association_catalog.partition_join_info import PartitionJoinInfo
 from hipscat.io import file_io, parquet_metadata, paths, write_metadata
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from lsdb_macauff.import_pipeline.arguments import MacauffArguments
 from lsdb_macauff.import_pipeline.map_reduce import reduce_associations, split_associations
