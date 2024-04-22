@@ -79,7 +79,6 @@ def test_empty_required(gaia_dir, catwise_dir, test_data_dir, import_metadata_ya
                 input_path=test_args[10],
                 input_format=test_args[11],
                 metadata_file_path=test_args[12],
-                overwrite=True,
             )
 
 

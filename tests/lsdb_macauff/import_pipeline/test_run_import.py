@@ -24,7 +24,7 @@ def test_bad_args(dask_client):
         runner.run(args, dask_client)
 
 
-@pytest.mark.dask
+@pytest.mark.dask(timeout=10)
 def test_object_to_object(
     import_catalog_a,
     import_catalog_b,
@@ -56,7 +56,6 @@ def test_object_to_object(
         right_id_column="catalog_b_name",
         input_file_list=[import_match_csv],
         input_format="csv",
-        overwrite=True,
         file_reader=CsvReader(schema_file=matches_schema_file, header=None),
         metadata_file_path=matches_schema_file,
         progress_bar=False,
