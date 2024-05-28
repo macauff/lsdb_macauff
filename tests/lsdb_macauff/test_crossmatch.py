@@ -1,8 +1,6 @@
 import pandas as pd
 import pytest
-from hipscat.catalog import Catalog
 from hipscat.catalog.catalog_info import CatalogInfo
-from hipscat.pixel_math import HealpixPixel
 
 from lsdb_macauff.macauff_crossmatch import MacauffCrossmatch
 
@@ -13,8 +11,8 @@ def test_macauff_crossmatch(
 ):
     """We know this will fail, but that's ok for now!"""
 
-    catalog_a = Catalog(CatalogInfo({"catalog_name": "catalog_a"}), [HealpixPixel(0, 0)])
-    catalog_b = Catalog(CatalogInfo({"catalog_name": "catalog_b"}), [HealpixPixel(0, 0)])
+    catalog_a_info = CatalogInfo({"catalog_name": "catalog_a"})
+    catalog_b_info = CatalogInfo({"catalog_name": "catalog_b"})
 
     algo = MacauffCrossmatch(
         left=pd.read_csv(catalog_a_csv),
@@ -23,10 +21,10 @@ def test_macauff_crossmatch(
         left_pixel=0,
         right_order=0,
         right_pixel=0,
-        left_metadata=catalog_a,
-        right_metadata=catalog_b,
+        left_catalog_info=catalog_a_info,
+        right_catalog_info=catalog_b_info,
+        right_margin_catalog_info=None,
         suffixes=("a", "b"),
-        right_margin_hc_structure=None,
     )
     algo.crossmatch(all_sky_params, gaia_all_sky_params, wise_all_sky_params, None, None)
 
@@ -37,8 +35,8 @@ def test_make_data_arrays(catalog_a_csv, catalog_b_csv, gaia_all_sky_params, wis
     a_expected_len = len(pd.read_csv(catalog_a_csv))
     b_expected_len = len(pd.read_csv(catalog_b_csv))
 
-    catalog_a = Catalog(CatalogInfo({"catalog_name": "catalog_a"}), [HealpixPixel(0, 0)])
-    catalog_b = Catalog(CatalogInfo({"catalog_name": "catalog_b"}), [HealpixPixel(0, 0)])
+    catalog_a_info = CatalogInfo({"catalog_name": "catalog_a"})
+    catalog_b_info = CatalogInfo({"catalog_name": "catalog_b"})
 
     gaia_all_sky_params.filt_names = ["filter_0", "filter_1", "filter_2"]
     wise_all_sky_params.filt_names = ["filter_0", "filter_1"]
@@ -50,15 +48,17 @@ def test_make_data_arrays(catalog_a_csv, catalog_b_csv, gaia_all_sky_params, wis
         left_pixel=0,
         right_order=0,
         right_pixel=0,
-        left_metadata=catalog_a,
-        right_metadata=catalog_b,
+        left_catalog_info=catalog_a_info,
+        right_catalog_info=catalog_b_info,
+        right_margin_catalog_info=None,
         suffixes=("a", "b"),
-        right_margin_hc_structure=None,
     )
 
-    a_astro, a_photo, a_magref = algo.make_data_arrays(algo.left, algo.left_metadata, gaia_all_sky_params)
+    a_astro, a_photo, a_magref = algo.make_data_arrays(
+        algo.left, algo.left_catalog_info, gaia_all_sky_params)
 
-    b_astro, b_photo, b_magref = algo.make_data_arrays(algo.right, algo.right_metadata, wise_all_sky_params)
+    b_astro, b_photo, b_magref = algo.make_data_arrays(
+        algo.right, algo.right_catalog_info, wise_all_sky_params)
 
     assert a_astro.shape == (a_expected_len, 3)
     assert a_photo.shape == (a_expected_len, len(gaia_all_sky_params.filt_names))

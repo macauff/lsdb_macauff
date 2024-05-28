@@ -35,14 +35,15 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         # Apply astrometric corrections?
 
         # get the dataframes
-        a_astro, a_photo, a_magref = self.make_data_arrays(self.left, self.left_metadata, left_all_sky_params)
+        a_astro, a_photo, a_magref = self.make_data_arrays(
+            self.left, self.left_catalog_info, left_all_sky_params)
 
         all_macauff_attrs.a_astro = a_astro
         all_macauff_attrs.a_photo = a_photo
         all_macauff_attrs.a_magref = a_magref
 
         b_astro, b_photo, b_magref = self.make_data_arrays(
-            self.right, self.right_metadata, right_all_sky_params
+            self.right, self.right_catalog_info, right_all_sky_params
         )
 
         all_macauff_attrs.b_astro = b_astro
@@ -53,17 +54,12 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         # macauff()
         return self.make_joint_dataframe(all_macauff_attrs)
 
-    def make_data_arrays(self, data, metadata, params):
+    def make_data_arrays(self, data, catalog_info, params):
         """Creates the astro, photo, and magref arrays for a given catalog's dataset."""
-        ra_column = metadata.catalog_info.ra_column
-        dec_column = metadata.catalog_info.dec_column
         uncertainty_column = params.uncertainty_column_name
-        astro = data[[ra_column, dec_column, uncertainty_column]].to_numpy()
-
+        astro = data[[catalog_info.ra_column, catalog_info.dec_column, uncertainty_column]].to_numpy()
         photo = data[params.filt_names].to_numpy()
-
         magref = data[params.magref_column_name].to_numpy()
-
         return astro, photo, magref
 
     def make_joint_dataframe(self, macauff_attrs: AllMacauffAttrs) -> pd.DataFrame:
