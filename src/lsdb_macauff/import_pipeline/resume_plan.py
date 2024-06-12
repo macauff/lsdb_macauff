@@ -46,7 +46,7 @@ class MacauffResumePlan(PipelineResumePlan):
         ## Make sure it's safe to use existing resume state.
         super().safe_to_resume()
 
-        with tqdm(total=5, desc="Planning", disable=not args.progress_bar) as step_progress:
+        with tqdm(total=4, desc="Planning", disable=not args.progress_bar) as step_progress:
             ## Validate existing resume state.
             ## - if a later stage is complete, the earlier stages should be complete too.
             splitting_done = self.is_splitting_done()
