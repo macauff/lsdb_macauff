@@ -54,11 +54,11 @@ def test_make_data_arrays(catalog_a_csv, catalog_b_csv, gaia_all_sky_params, wis
         suffixes=("a", "b"),
     )
 
-    a_astro, a_photo, a_magref = algo.make_data_arrays(
-        algo.left, algo.left_catalog_info, gaia_all_sky_params)
+    a_astro, a_photo, a_magref = algo.make_data_arrays(algo.left, algo.left_catalog_info, gaia_all_sky_params)
 
     b_astro, b_photo, b_magref = algo.make_data_arrays(
-        algo.right, algo.right_catalog_info, wise_all_sky_params)
+        algo.right, algo.right_catalog_info, wise_all_sky_params
+    )
 
     assert a_astro.shape == (a_expected_len, 3)
     assert a_photo.shape == (a_expected_len, len(gaia_all_sky_params.filt_names))

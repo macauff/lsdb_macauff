@@ -36,7 +36,8 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
 
         # get the dataframes
         a_astro, a_photo, a_magref = self.make_data_arrays(
-            self.left, self.left_catalog_info, left_all_sky_params)
+            self.left, self.left_catalog_info, left_all_sky_params
+        )
 
         all_macauff_attrs.a_astro = a_astro
         all_macauff_attrs.a_photo = a_photo
