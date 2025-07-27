@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from os import path
-from typing import List
+from pathlib import Path
 
-from hipscat.catalog.association_catalog.association_catalog import AssociationCatalogInfo
-from hipscat.catalog.catalog_type import CatalogType
-from hipscat.io import FilePointer
-from hipscat.io.validation import is_valid_catalog
-from hipscat_import.catalog.file_readers import InputReader, get_file_reader
-from hipscat_import.runtime_arguments import RuntimeArguments, find_input_paths
+import hats
+from hats.catalog import TableProperties
+from hats.io.validation import is_valid_catalog
+from hats_import.catalog.file_readers import InputReader, get_file_reader
+from hats_import.runtime_arguments import RuntimeArguments, find_input_paths
+from upath import UPath
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=unsupported-binary-operation
@@ -20,15 +20,15 @@ class MacauffArguments(RuntimeArguments):
     """Data class for holding cross-match association arguments"""
 
     ## Input - Cross-match data
-    input_path: FilePointer | None = None
+    input_path: UPath | None = None
     """path to search for the input data"""
     input_format: str = ""
     """specifier of the input data format. this will be used to find an appropriate
     InputReader type, and may be used to find input files, via a match like
     ``<input_path>/*<input_format>`` """
-    input_file_list: List[FilePointer] = field(default_factory=list)
+    input_file_list: list[str | Path | UPath] = field(default_factory=list)
     """can be used instead of `input_format` to import only specified files"""
-    input_paths: List[FilePointer] = field(default_factory=list)
+    input_paths: list[str | Path | UPath] = field(default_factory=list)
     """resolved list of all files that will be used in the importer"""
 
     ## Input - Left catalog
@@ -95,30 +95,16 @@ class MacauffArguments(RuntimeArguments):
         if not self.file_reader:
             self.file_reader = get_file_reader(file_format=self.input_format)
 
-    def to_catalog_info(self, total_rows) -> AssociationCatalogInfo:
+    def to_table_properties(self, total_rows) -> TableProperties:
         """Catalog-type-specific dataset info."""
-        info = {
+        info = self.extra_property_dict() | {
             "catalog_name": self.output_artifact_name,
-            "catalog_type": CatalogType.ASSOCIATION,
+            "catalog_type": "association",
+            "contains_leaf_files": True,
             "total_rows": total_rows,
             "primary_column": self.left_id_column,
             "primary_catalog": str(self.left_catalog_dir),
             "join_column": self.right_id_column,
             "join_catalog": str(self.right_catalog_dir),
         }
-        return AssociationCatalogInfo(**info)
-
-    def additional_runtime_provenance_info(self) -> dict:
-        return {
-            "input_path": self.input_path,
-            "input_format": self.input_format,
-            "left_catalog_dir": self.left_catalog_dir,
-            "left_id_column": self.left_id_column,
-            "left_ra_column": self.left_ra_column,
-            "left_dec_column": self.left_dec_column,
-            "right_catalog_dir": self.right_catalog_dir,
-            "right_id_column": self.right_id_column,
-            "right_ra_column": self.right_ra_column,
-            "right_dec_column": self.right_dec_column,
-            "metadata_file_path": self.metadata_file_path,
-        }
+        return TableProperties(**info)

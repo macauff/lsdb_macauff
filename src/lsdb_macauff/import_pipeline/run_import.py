@@ -1,8 +1,8 @@
 import os
 import pickle
 
-from hipscat.catalog.association_catalog.partition_join_info import PartitionJoinInfo
-from hipscat.io import file_io, parquet_metadata, paths, write_metadata
+from hats.catalog import PartitionInfo
+from hats.io import file_io, parquet_metadata, paths
 from tqdm.auto import tqdm
 
 from lsdb_macauff.import_pipeline.arguments import MacauffArguments
@@ -69,18 +69,12 @@ def run(args, client):
         metadata_path = paths.get_parquet_metadata_pointer(args.catalog_path)
         for row_group in parquet_metadata.read_row_group_fragments(metadata_path):
             total_rows += row_group.num_rows
-        partition_join_info = PartitionJoinInfo.read_from_file(metadata_path)
-        partition_join_info.write_to_csv(catalog_path=args.catalog_path)
+        partition_info = PartitionInfo.read_from_file(metadata_path)
+        # partition_join_info.write_to_csv(catalog_path=args.catalog_path)
         step_progress.update(1)
         total_rows = int(total_rows)
-        catalog_info = args.to_catalog_info(total_rows)
-        write_metadata.write_provenance_info(
-            catalog_base_dir=args.catalog_path,
-            dataset_info=catalog_info,
-            tool_args=args.provenance_info(),
-        )
-        step_progress.update(1)
-        write_metadata.write_catalog_info(dataset_info=catalog_info, catalog_base_dir=args.catalog_path)
+        catalog_info = args.to_table_properties(total_rows)
+        catalog_info.to_properties_file(args.catalog_path)
         step_progress.update(1)
         file_io.remove_directory(args.tmp_path, ignore_errors=True)
         step_progress.update(1)

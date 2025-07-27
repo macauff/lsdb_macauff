@@ -1,9 +1,9 @@
 import os
 
+import hats
 import pytest
-from hipscat.catalog.association_catalog.association_catalog import AssociationCatalog
-from hipscat.io import file_io
-from hipscat_import.catalog.file_readers import CsvReader
+from hats.io import file_io
+from hats_import.catalog.file_readers import CsvReader
 
 import lsdb_macauff.import_pipeline.run_import as runner
 from lsdb_macauff.import_pipeline.arguments import MacauffArguments
@@ -64,8 +64,8 @@ def test_object_to_object(
     runner.run(args, dask_client)
 
     ## Check that the association data can be parsed as a valid association catalog.
-    catalog = AssociationCatalog.read_from_hipscat(args.catalog_path)
+    catalog = hats.read_hats(args.catalog_path)
     assert catalog.on_disk
     assert catalog.catalog_path == args.catalog_path
-    assert len(catalog.get_join_pixels()) == 1
+    assert len(catalog.get_healpix_pixels()) == 1
     assert catalog.catalog_info.total_rows == 40

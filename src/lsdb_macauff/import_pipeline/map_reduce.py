@@ -1,14 +1,14 @@
 import pickle
 
-import healpy as hp
+import hats.pixel_math.healpix_shim as hp
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
-from hipscat.io import file_io, paths
-from hipscat.pixel_math.healpix_pixel import HealpixPixel
-from hipscat.pixel_math.healpix_pixel_function import get_pixel_argsort
-from hipscat_import.catalog.map_reduce import _iterate_input_file
-from hipscat_import.pipeline_resume_plan import get_pixel_cache_directory, print_task_failure
+from hats import HealpixPixel
+from hats.io import file_io, paths
+from hats.pixel_math.healpix_pixel_function import get_pixel_argsort
+from hats_import.catalog.map_reduce import _iterate_input_file
+from hats_import.pipeline_resume_plan import get_pixel_cache_directory, print_task_failure
 
 from lsdb_macauff.import_pipeline.resume_plan import MacauffResumePlan
 
@@ -48,12 +48,8 @@ def split_associations(
             aligned_left_pixels = left_alignment[mapped_left_pixels]
             unique_pixels, unique_inverse = np.unique(aligned_left_pixels, return_inverse=True)
 
-            mapped_right_pixels = hp.ang2pix(
-                2**highest_right_order,
-                data[right_ra_column].values,
-                data[right_dec_column].values,
-                lonlat=True,
-                nest=True,
+            mapped_right_pixels = hp.radec2pix(
+                highest_right_order, data[right_ra_column].values, data[right_dec_column].values
             )
             aligned_right_pixels = right_alignment[mapped_right_pixels]
 
@@ -100,7 +96,7 @@ def reduce_associations(left_pixel, tmp_path, catalog_path, reduce_key):
         destination_dir = paths.pixel_directory(catalog_path, left_pixel.order, left_pixel.pixel)
         file_io.make_directory(destination_dir, exist_ok=True)
 
-        destination_file = paths.pixel_catalog_file(catalog_path, left_pixel.order, left_pixel.pixel)
+        destination_file = paths.pixel_catalog_file(catalog_path, left_pixel)
 
         merged_table = pq.read_table(inputs)
         dataframe = merged_table.to_pandas().reset_index()

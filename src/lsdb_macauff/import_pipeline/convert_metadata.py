@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import pyarrow as pa
 import pyarrow.parquet as pq
 import yaml
-from hipscat.io import file_io
+from upath import UPath
 
 
 def _get_inner_xml_value(parent_el, node_type, default_value):
@@ -65,7 +65,7 @@ def from_xml(input_file, output_file):
     pq.write_table(schema.empty_table(), where=output_file)
 
 
-def from_yaml(input_file, output_directory):
+def from_yaml(input_file, output_directory: UPath):
     """Read YAML file with column metadata for the various cross-match files from macauff.
 
     Expects YAML with the format::
@@ -98,5 +98,5 @@ def from_yaml(input_file, output_directory):
                 fields.append(_construct_field(name, units, metadata_dict=column))
 
             schema = pa.schema(fields)
-            output_file = file_io.append_paths_to_pointer(output_directory, f"{table_name}.parquet")
+            output_file = output_directory / f"{table_name}.parquet"
             pq.write_table(schema.empty_table(), where=str(output_file))

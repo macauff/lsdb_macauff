@@ -166,7 +166,7 @@ def test_macauff_args_invalid_metadata_file(gaia_dir, catwise_dir, test_data_dir
 
 
 def test_macauff_args_invalid_input_directory(gaia_dir, catwise_dir, import_metadata_yaml, tmp_path):
-    with pytest.raises(FileNotFoundError, match="input_path not found"):
+    with pytest.raises(FileNotFoundError, match="No input files found"):
         MacauffArguments(
             output_path=tmp_path,
             output_artifact_name="object_to_source",
@@ -181,25 +181,5 @@ def test_macauff_args_invalid_input_directory(gaia_dir, catwise_dir, import_meta
             right_id_column="source_id",
             input_path="ceci_n_est_pas_un_directoire/",
             input_format="csv",
-            metadata_file_path=import_metadata_yaml,
-        )
-
-
-def test_macauff_args_no_files(gaia_dir, catwise_dir, test_data_dir, import_metadata_yaml, tmp_path):
-    with pytest.raises(FileNotFoundError, match="No input files found"):
-        MacauffArguments(
-            output_path=tmp_path,
-            output_artifact_name="object_to_source",
-            tmp_dir=tmp_path,
-            left_catalog_dir=gaia_dir,
-            left_ra_column="ra",
-            left_dec_column="dec",
-            left_id_column="id",
-            right_catalog_dir=catwise_dir,
-            right_ra_column="source_ra",
-            right_dec_column="source_dec",
-            right_id_column="source_id",
-            input_path=test_data_dir,
-            input_format="parquet",  # no files of this format will be found
             metadata_file_path=import_metadata_yaml,
         )

@@ -1,0 +1,14 @@
+#HATS catalog
+obs_collection=gaia
+dataproduct_type=object
+hats_nrows=3572
+hats_col_ra=ra
+hats_col_dec=dec
+hats_npix_suffix=.parquet
+hats_builder=lsdb v0.1.dev1+gb94ee4c hats-importer conversion v0.6.2
+hats_creation_date=2025-07-27T20\:23UTC
+hats_estsize=2601
+hats_release_date=2024-09-18
+hats_version=v0.1
+hats_max_rows=100000
+hats_order=2
