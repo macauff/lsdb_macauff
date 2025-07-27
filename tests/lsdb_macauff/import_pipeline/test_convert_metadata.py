@@ -2,7 +2,7 @@ import os
 from xml.etree.ElementTree import ParseError
 
 import pytest
-from hipscat.io import file_io
+from hats.io import file_io
 
 from lsdb_macauff.import_pipeline.convert_metadata import from_xml, from_yaml
 

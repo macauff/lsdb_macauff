@@ -45,12 +45,12 @@ def counterpart_csv(test_data_dir):
 
 @pytest.fixture
 def catwise_dir(test_data_dir):
-    return os.path.join(test_data_dir, "catwise_test_data")
+    return os.path.join(test_data_dir, "catwise_hats_data")
 
 
 @pytest.fixture
 def gaia_dir(test_data_dir):
-    return os.path.join(test_data_dir, "gaia_test_data")
+    return os.path.join(test_data_dir, "gaia_hats_data")
 
 
 @pytest.fixture(scope="session", name="dask_client")

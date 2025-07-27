@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import pickle
+import re
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import List
 
-import healpy as hp
+import hats
+import hats.pixel_math.healpix_shim as hp
 import numpy as np
-from hipscat.catalog import Catalog
-from hipscat.io import FilePointer, file_io
-from hipscat.pixel_math.healpix_pixel import HealpixPixel
-from hipscat_import.pipeline_resume_plan import PipelineResumePlan
+from hats import HealpixPixel
+from hats.catalog import Catalog
+from hats.io import file_io
+from hats_import.pipeline_resume_plan import PipelineResumePlan
 from tqdm.auto import tqdm
+from upath import UPath
 
 from lsdb_macauff.import_pipeline.arguments import MacauffArguments
 
@@ -21,7 +25,7 @@ from lsdb_macauff.import_pipeline.arguments import MacauffArguments
 class MacauffResumePlan(PipelineResumePlan):
     """Container class for holding the state of each file in the pipeline plan."""
 
-    input_paths: List[FilePointer] = field(default_factory=list)
+    input_paths: List[str | Path | UPath] = field(default_factory=list)
     """resolved list of all files that will be used in the importer"""
     left_pixels: List[HealpixPixel] = field(default_factory=list)
     highest_left_order: int = 0
@@ -58,9 +62,9 @@ class MacauffResumePlan(PipelineResumePlan):
             ## Validate that we're operating on the same file set as the previous instance.
             self.input_paths = self.check_original_input_paths(self.input_paths)
 
-            left_catalog = Catalog.read_from_hipscat(args.left_catalog_dir)
+            left_catalog = hats.read_hats(args.left_catalog_dir)
             step_progress.update(1)
-            right_catalog = Catalog.read_from_hipscat(args.right_catalog_dir)
+            right_catalog = hats.read_hats(args.right_catalog_dir)
             step_progress.update(1)
             self.highest_left_order = left_catalog.partition_info.get_highest_order()
             self.highest_right_order = right_catalog.partition_info.get_highest_order()
@@ -123,12 +127,11 @@ class MacauffResumePlan(PipelineResumePlan):
         Returns:
             list of splitting keys *not* found in files like /resume/path/split_key.done
         """
-        split_keys = set(self.read_done_keys(self.SPLITTING_STAGE))
-        return [
-            (f"split_{i}", file_path)
-            for i, file_path in enumerate(self.input_paths)
-            if f"split_{i}" not in split_keys
-        ]
+        prefix = file_io.get_upath(self.tmp_path) / self.SPLITTING_STAGE
+        split_file_pattern = re.compile(r"split_(\d+)_done")
+        done_indexes = [int(split_file_pattern.match(path.name).group(1)) for path in prefix.glob("*_done")]
+        remaining_indexes = list(set(range(0, len(self.input_paths))) - set(done_indexes))
+        return [(f"split_{key}", self.input_paths[key]) for key in remaining_indexes]
 
     @classmethod
     def splitting_key_done(cls, tmp_path, splitting_key: str):
@@ -171,11 +174,11 @@ class MacauffResumePlan(PipelineResumePlan):
         - reduce key (string of left order+pixel)
 
         """
-        reduced_keys = set(self.read_done_keys(self.REDUCING_STAGE))
+        reduced_keys = set(self.read_done_pixels(self.REDUCING_STAGE))
         reduce_items = [
             (hp_pixel, f"{hp_pixel.order}_{hp_pixel.pixel}")
             for hp_pixel in self.left_pixels
-            if f"{hp_pixel.order}_{hp_pixel.pixel}" not in reduced_keys
+            if hp_pixel not in reduced_keys
         ]
         return reduce_items
 
