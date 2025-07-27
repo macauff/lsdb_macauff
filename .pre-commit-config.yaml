@@ -1,9 +1,10 @@
+
 repos:
     # Compare the local template version to the latest remote template version
     # This hook should always pass. It will print a message if the local version 
     # is out of date.
   - repo: https://github.com/lincc-frameworks/pre-commit-hooks
-    rev: v0.1.1
+    rev: v0.1.2
     hooks:
       - id: check-lincc-frameworks-template-version
         name: Check template version
@@ -82,7 +83,7 @@ repos:
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
-        language_version: python3.10
+        language_version: python3.11
     # Run unit tests, verify that they pass. Note that coverage is run against
     # the ./src directory here because that is what will be committed. In the
     # github workflow script, the coverage is run against the installed package
