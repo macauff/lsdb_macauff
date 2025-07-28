@@ -461,6 +461,8 @@ max-nested-blocks=5
 # printed.
 never-returning-functions=sys.exit,argparse.parse_error
 
+max-positional-arguments=10
+
 
 [REPORTS]
 

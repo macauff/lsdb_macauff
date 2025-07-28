@@ -68,15 +68,11 @@ def pytest_collection_modifyitems(items):
     - ignore event loop deprecation warnings
     - require use of the `dask_client` fixture, even if it's not requsted
     """
-    first_dask = True
     for item in items:
         is_dask = False
-        for mark in item.iter_markers(name="dask"):
+        if item.iter_markers(name="dask"):
             is_dask = True
         if is_dask:
-            if first_dask:
-                ## The first test requires more time to set up the dask/ray client
-                first_dask = False
             item.add_marker(pytest.mark.usefixtures("dask_client"))
             item.add_marker(pytest.mark.filterwarnings("ignore::DeprecationWarning"))
 

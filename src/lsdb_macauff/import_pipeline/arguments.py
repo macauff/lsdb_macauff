@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from os import path
 from pathlib import Path
 
-import hats
 from hats.catalog import TableProperties
 from hats.io.validation import is_valid_catalog
 from hats_import.catalog.file_readers import InputReader, get_file_reader
