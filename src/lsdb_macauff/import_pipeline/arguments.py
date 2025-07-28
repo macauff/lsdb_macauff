@@ -40,8 +40,6 @@ class MacauffArguments(RuntimeArguments):
     ## Input - Right catalog
     right_catalog_dir: str = ""
     right_id_column: str = ""
-    right_ra_column: str = ""
-    right_dec_column: str = ""
 
     ## `macauff` specific attributes
     metadata_file_path: str = ""
@@ -77,10 +75,6 @@ class MacauffArguments(RuntimeArguments):
             raise ValueError("right_catalog_dir is required")
         if not self.right_id_column:
             raise ValueError("right_id_column is required")
-        if not self.right_ra_column:
-            raise ValueError("right_ra_column is required")
-        if not self.right_dec_column:
-            raise ValueError("right_dec_column is required")
         if not is_valid_catalog(self.right_catalog_dir):
             raise ValueError("right_catalog_dir not a valid catalog")
 

@@ -24,7 +24,6 @@ def test_bad_args(dask_client):
         runner.run(args, dask_client)
 
 
-@pytest.mark.dask(timeout=10)
 def test_object_to_object(
     import_catalog_a,
     import_catalog_b,
@@ -51,8 +50,6 @@ def test_object_to_object(
         left_dec_column="catalog_a_dec",
         left_id_column="catalog_a_id",
         right_catalog_dir=import_catalog_b,
-        right_ra_column="catalog_b_ra",
-        right_dec_column="catalog_b_dec",
         right_id_column="catalog_b_name",
         input_file_list=[import_match_csv],
         input_format="csv",
@@ -69,3 +66,13 @@ def test_object_to_object(
     assert catalog.catalog_path == args.catalog_path
     assert len(catalog.get_healpix_pixels()) == 1
     assert catalog.catalog_info.total_rows == 40
+
+    assert catalog.original_schema.names == [
+        "catalog_a_id",
+        "catalog_a_ra",
+        "catalog_a_dec",
+        "catalog_b_name",
+        "catalog_b_ra",
+        "catalog_b_dec",
+        "match_p",
+    ]

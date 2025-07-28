@@ -32,13 +32,9 @@ def run(args, client):
                     pickled_reader_file=pickled_reader_file,
                     splitting_key=key,
                     highest_left_order=resume_plan.highest_left_order,
-                    highest_right_order=resume_plan.highest_right_order,
                     left_alignment_file=resume_plan.left_alignment_file,
-                    right_alignment_file=resume_plan.right_alignment_file,
                     left_ra_column=args.left_ra_column,
                     left_dec_column=args.left_dec_column,
-                    right_ra_column=args.right_ra_column,
-                    right_dec_column=args.right_dec_column,
                     tmp_path=args.tmp_path,
                 )
             )
@@ -63,14 +59,14 @@ def run(args, client):
         resume_plan.wait_for_reducing(futures)
 
     # All done - write out the metadata
-    with tqdm(total=4, desc="Finishing", disable=not args.progress_bar) as step_progress:
+    with tqdm(total=3, desc="Finishing", disable=not args.progress_bar) as step_progress:
         parquet_metadata.write_parquet_metadata(args.catalog_path)
         total_rows = 0
         metadata_path = paths.get_parquet_metadata_pointer(args.catalog_path)
         for row_group in parquet_metadata.read_row_group_fragments(metadata_path):
             total_rows += row_group.num_rows
         partition_info = PartitionInfo.read_from_file(metadata_path)
-        # partition_join_info.write_to_csv(catalog_path=args.catalog_path)
+        partition_info.write_to_file(args.catalog_path / "partition_info.csv")
         step_progress.update(1)
         total_rows = int(total_rows)
         catalog_info = args.to_table_properties(total_rows)

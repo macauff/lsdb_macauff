@@ -20,8 +20,6 @@ def test_macauff_arguments(catwise_dir, gaia_dir, test_data_dir, import_metadata
         left_dec_column="dec",
         left_id_column="id",
         right_catalog_dir=catwise_dir,
-        right_ra_column="source_ra",
-        right_dec_column="source_dec",
         right_id_column="source_id",
         input_path=test_data_dir,
         input_format="csv",
@@ -45,8 +43,6 @@ def test_empty_required(gaia_dir, catwise_dir, test_data_dir, import_metadata_ya
         ["left_dec_column", "dec"],
         ["left_id_column", "id"],
         ["right_catalog_dir", catwise_dir],
-        ["right_ra_column", "source_ra"],
-        ["right_dec_column", "source_dec"],
         ["right_id_column", "source_id"],
         ["input_path", test_data_dir],
         ["input_format", "csv"],
@@ -61,8 +57,6 @@ def test_empty_required(gaia_dir, catwise_dir, test_data_dir, import_metadata_ya
             for list_index, list_args in enumerate(required_args)
         ]
 
-        print(f"testing required arg #{index}")
-
         with pytest.raises(ValueError, match=args[0]):
             MacauffArguments(
                 output_path=test_args[0],
@@ -73,12 +67,10 @@ def test_empty_required(gaia_dir, catwise_dir, test_data_dir, import_metadata_ya
                 left_dec_column=test_args[4],
                 left_id_column=test_args[5],
                 right_catalog_dir=test_args[6],
-                right_ra_column=test_args[7],
-                right_dec_column=test_args[8],
-                right_id_column=test_args[9],
-                input_path=test_args[10],
-                input_format=test_args[11],
-                metadata_file_path=test_args[12],
+                right_id_column=test_args[7],
+                input_path=test_args[8],
+                input_format=test_args[9],
+                metadata_file_path=test_args[10],
             )
 
 
@@ -94,8 +86,6 @@ def test_macauff_arguments_file_list(gaia_dir, catwise_dir, test_data_dir, impor
         left_dec_column="dec",
         left_id_column="id",
         right_catalog_dir=catwise_dir,
-        right_ra_column="source_ra",
-        right_dec_column="source_dec",
         right_id_column="source_id",
         input_file_list=files,
         input_format="csv",
@@ -116,8 +106,6 @@ def test_macauff_args_invalid_catalog(catwise_dir, test_data_dir, import_metadat
             left_dec_column="dec",
             left_id_column="id",
             right_catalog_dir=catwise_dir,
-            right_ra_column="source_ra",
-            right_dec_column="source_dec",
             right_id_column="source_id",
             input_path=test_data_dir,
             input_format="csv",
@@ -136,8 +124,6 @@ def test_macauff_args_right_invalid_catalog(catwise_dir, test_data_dir, import_m
             left_dec_column="dec",
             left_id_column="id",
             right_catalog_dir=test_data_dir,  # valid directory with files, not a catalog
-            right_ra_column="source_ra",
-            right_dec_column="source_dec",
             right_id_column="source_id",
             input_path=test_data_dir,
             input_format="csv",
@@ -156,8 +142,6 @@ def test_macauff_args_invalid_metadata_file(gaia_dir, catwise_dir, test_data_dir
             left_dec_column="dec",
             left_id_column="id",
             right_catalog_dir=catwise_dir,
-            right_ra_column="source_ra",
-            right_dec_column="source_dec",
             right_id_column="source_id",
             input_path=test_data_dir,
             input_format="csv",
@@ -176,8 +160,6 @@ def test_macauff_args_invalid_input_directory(gaia_dir, catwise_dir, import_meta
             left_dec_column="dec",
             left_id_column="id",
             right_catalog_dir=catwise_dir,
-            right_ra_column="source_ra",
-            right_dec_column="source_dec",
             right_id_column="source_id",
             input_path="ceci_n_est_pas_un_directoire/",
             input_format="csv",
