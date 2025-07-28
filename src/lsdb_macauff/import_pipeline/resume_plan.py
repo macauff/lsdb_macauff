@@ -12,7 +12,6 @@ import hats
 import hats.pixel_math.healpix_shim as hp
 import numpy as np
 from hats import HealpixPixel
-from hats.catalog import Catalog
 from hats.io import file_io
 from hats_import.pipeline_resume_plan import PipelineResumePlan
 from tqdm.auto import tqdm
@@ -29,14 +28,11 @@ class MacauffResumePlan(PipelineResumePlan):
     """resolved list of all files that will be used in the importer"""
     left_pixels: List[HealpixPixel] = field(default_factory=list)
     highest_left_order: int = 0
-    highest_right_order: int = 0
     left_alignment_file: str = None
-    right_alignment_file: str = None
 
     SPLITTING_STAGE = "splitting"
     REDUCING_STAGE = "reducing"
     LEFT_ALIGNMENT_FILE = "left_alignment.pickle"
-    RIGHT_ALIGNMENT_FILE = "right_alignment.pickle"
 
     def __init__(self, args: MacauffArguments):
         if not args.tmp_path:  # pragma: no cover (not reachable, but required for mypy)
@@ -50,7 +46,7 @@ class MacauffResumePlan(PipelineResumePlan):
         ## Make sure it's safe to use existing resume state.
         super().safe_to_resume()
 
-        with tqdm(total=4, desc="Planning", disable=not args.progress_bar) as step_progress:
+        with tqdm(total=3, desc="Planning", disable=not args.progress_bar) as step_progress:
             ## Validate existing resume state.
             ## - if a later stage is complete, the earlier stages should be complete too.
             splitting_done = self.is_splitting_done()
@@ -64,25 +60,16 @@ class MacauffResumePlan(PipelineResumePlan):
 
             left_catalog = hats.read_hats(args.left_catalog_dir)
             step_progress.update(1)
-            right_catalog = hats.read_hats(args.right_catalog_dir)
-            step_progress.update(1)
             self.highest_left_order = left_catalog.partition_info.get_highest_order()
-            self.highest_right_order = right_catalog.partition_info.get_highest_order()
 
             self.left_pixels = left_catalog.partition_info.get_healpix_pixels()
-            right_pixels = right_catalog.partition_info.get_healpix_pixels()
 
             ## Gather keys for execution.
             if not splitting_done:
                 self.left_alignment_file = file_io.append_paths_to_pointer(
                     self.tmp_path, self.LEFT_ALIGNMENT_FILE
                 )
-                self.right_alignment_file = file_io.append_paths_to_pointer(
-                    self.tmp_path, self.RIGHT_ALIGNMENT_FILE
-                )
-                if not file_io.does_file_or_directory_exist(
-                    self.left_alignment_file
-                ) or not file_io.does_file_or_directory_exist(self.right_alignment_file):
+                if not file_io.does_file_or_directory_exist(self.left_alignment_file):
                     regenerated_left_alignment = np.full(hp.order2npix(self.highest_left_order), None)
                     for pixel in self.left_pixels:
                         explosion_factor = 4 ** (self.highest_left_order - pixel.order)
@@ -91,20 +78,9 @@ class MacauffResumePlan(PipelineResumePlan):
                             (pixel.pixel + 1) * explosion_factor,
                         )
                         regenerated_left_alignment[exploded_pixels] = pixel
-                    regenerated_right_alignment = np.full(hp.order2npix(self.highest_right_order), None)
-                    for pixel in right_pixels:
-                        explosion_factor = 4 ** (self.highest_right_order - pixel.order)
-                        exploded_pixels = np.arange(
-                            pixel.pixel * explosion_factor,
-                            (pixel.pixel + 1) * explosion_factor,
-                        )
-                        regenerated_right_alignment[exploded_pixels] = pixel
 
                     with open(self.left_alignment_file, "wb") as pickle_file:
                         pickle.dump(regenerated_left_alignment, pickle_file)
-
-                    with open(self.right_alignment_file, "wb") as pickle_file:
-                        pickle.dump(regenerated_right_alignment, pickle_file)
 
             step_progress.update(1)
 

@@ -1,12 +1,10 @@
 import pickle
 
-import hats.pixel_math.healpix_shim as hp
 import numpy as np
+import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-from hats import HealpixPixel
 from hats.io import file_io, paths
-from hats.pixel_math.healpix_pixel_function import get_pixel_argsort
 from hats_import.catalog.map_reduce import _iterate_input_file
 from hats_import.pipeline_resume_plan import get_pixel_cache_directory, print_task_failure
 
@@ -20,13 +18,9 @@ def split_associations(
     pickled_reader_file,
     splitting_key,
     highest_left_order,
-    highest_right_order,
     left_alignment_file,
-    right_alignment_file,
     left_ra_column,
     left_dec_column,
-    right_ra_column,
-    right_dec_column,
     tmp_path,
 ):
     """Map a file of links to their healpix pixels and split into shards.
@@ -39,27 +33,12 @@ def split_associations(
     try:
         with open(left_alignment_file, "rb") as pickle_file:
             left_alignment = pickle.load(pickle_file)
-        with open(right_alignment_file, "rb") as pickle_file:
-            right_alignment = pickle.load(pickle_file)
 
         for chunk_number, data, mapped_left_pixels in _iterate_input_file(
             input_file, pickled_reader_file, highest_left_order, left_ra_column, left_dec_column, False
         ):
             aligned_left_pixels = left_alignment[mapped_left_pixels]
             unique_pixels, unique_inverse = np.unique(aligned_left_pixels, return_inverse=True)
-
-            mapped_right_pixels = hp.radec2pix(
-                highest_right_order, data[right_ra_column].values, data[right_dec_column].values
-            )
-            aligned_right_pixels = right_alignment[mapped_right_pixels]
-
-            data["Norder"] = [pix.order for pix in aligned_left_pixels]
-            data["Dir"] = [pix.dir for pix in aligned_left_pixels]
-            data["Npix"] = [pix.pixel for pix in aligned_left_pixels]
-
-            data["join_Norder"] = [pix.order for pix in aligned_right_pixels]
-            data["join_Dir"] = [pix.dir for pix in aligned_right_pixels]
-            data["join_Npix"] = [pix.pixel for pix in aligned_right_pixels]
 
             for unique_index, pixel in enumerate(unique_pixels):
                 mapped_indexes = np.where(unique_inverse == unique_index)
@@ -72,8 +51,16 @@ def split_associations(
                 output_file = file_io.append_paths_to_pointer(
                     pixel_dir, f"shard_{splitting_key}_{chunk_number}.parquet"
                 )
-                filtered_data.to_parquet(output_file, index=False)
-            del data, filtered_data, data_indexes
+                if isinstance(data, pd.DataFrame):
+                    filtered_data = data.iloc[unique_inverse == unique_index]
+                    filtered_data = pa.Table.from_pandas(
+                        filtered_data, preserve_index=False
+                    ).replace_schema_metadata()
+                else:
+                    filtered_data = data.filter(unique_inverse == unique_index)
+
+                pq.write_table(filtered_data, output_file.path, filesystem=output_file.fs)
+                del filtered_data
 
         MacauffResumePlan.splitting_key_done(tmp_path=tmp_path, splitting_key=splitting_key)
     except Exception as exception:  # pylint: disable=broad-exception-caught
@@ -99,21 +86,7 @@ def reduce_associations(left_pixel, tmp_path, catalog_path, reduce_key):
         destination_file = paths.pixel_catalog_file(catalog_path, left_pixel)
 
         merged_table = pq.read_table(inputs)
-        dataframe = merged_table.to_pandas().reset_index()
-
-        ## One row group per join_Norder/join_Npix
-
-        join_pixel_frames = dataframe.groupby(["join_Norder", "join_Npix"], group_keys=True)
-        join_pixels = [HealpixPixel(pixel[0], pixel[1]) for pixel, _ in join_pixel_frames]
-        pixel_argsort = get_pixel_argsort(join_pixels)
-        with pq.ParquetWriter(destination_file, merged_table.schema) as writer:
-            for pixel_index in pixel_argsort:
-                join_pixel = join_pixels[pixel_index]
-                join_pixel_frame = join_pixel_frames.get_group(
-                    (join_pixel.order, join_pixel.pixel)
-                ).reset_index()
-                writer.write_table(pa.Table.from_pandas(join_pixel_frame, schema=merged_table.schema))
-
+        pq.write_table(merged_table, destination_file.path, filesystem=destination_file.fs)
         MacauffResumePlan.reducing_key_done(tmp_path=tmp_path, reducing_key=reduce_key)
     except Exception as exception:  # pylint: disable=broad-exception-caught
         print_task_failure(
