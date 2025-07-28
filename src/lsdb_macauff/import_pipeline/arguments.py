@@ -33,12 +33,14 @@ class MacauffArguments(RuntimeArguments):
     ## Input - Left catalog
     left_catalog_dir: str = ""
     left_id_column: str = ""
+    left_assn_column: str = ""
     left_ra_column: str = ""
     left_dec_column: str = ""
 
     ## Input - Right catalog
     right_catalog_dir: str = ""
     right_id_column: str = ""
+    right_assn_column: str = ""
 
     ## `macauff` specific attributes
     metadata_file_path: str = ""
@@ -63,6 +65,8 @@ class MacauffArguments(RuntimeArguments):
             raise ValueError("left_catalog_dir is required")
         if not self.left_id_column:
             raise ValueError("left_id_column is required")
+        if not self.left_assn_column:
+            raise ValueError("left_assn_column is required")
         if not self.left_ra_column:
             raise ValueError("left_ra_column is required")
         if not self.left_dec_column:
@@ -74,6 +78,8 @@ class MacauffArguments(RuntimeArguments):
             raise ValueError("right_catalog_dir is required")
         if not self.right_id_column:
             raise ValueError("right_id_column is required")
+        if not self.right_assn_column:
+            raise ValueError("right_assn_column is required")
         if not is_valid_catalog(self.right_catalog_dir):
             raise ValueError("right_catalog_dir not a valid catalog")
 
@@ -95,9 +101,11 @@ class MacauffArguments(RuntimeArguments):
             "catalog_type": "association",
             "contains_leaf_files": True,
             "total_rows": total_rows,
-            "primary_column": self.left_id_column,
             "primary_catalog": str(self.left_catalog_dir),
-            "join_column": self.right_id_column,
+            "primary_column": self.left_id_column,
+            "primary_column_association": self.left_assn_column,
             "join_catalog": str(self.right_catalog_dir),
+            "join_column": self.right_id_column,
+            "join_column_association": self.right_assn_column,
         }
         return TableProperties(**info)
