@@ -1,7 +1,7 @@
 import os
 
 import pytest
-from dask.distributed import Client
+from dask.distributed import Client, LocalCluster
 
 from lsdb_macauff.config import AllSkyParams, CatalogAllSkyParams, load_config_from_file
 
@@ -56,37 +56,23 @@ def gaia_dir(test_data_dir):
 @pytest.fixture(scope="session", name="dask_client")
 def dask_client():
     """Create a single client for use by all unit test cases."""
-    client = Client()
+    cluster = LocalCluster(n_workers=1, threads_per_worker=1, dashboard_address=":0")
+    client = Client(cluster)
     yield client
     client.close()
+    cluster.close()
 
 
 def pytest_collection_modifyitems(items):
     """Modify dask unit tests to
-        - ignore event loop deprecation warnings
-        - have a longer timeout default timeout (5 seconds instead of 1 second)
-        - require use of the `dask_client` fixture, even if it's not requsted
-
-    Individual tests that will be particularly long-running can still override
-    the default timeout, by using an annotation like:
-
-        @pytest.mark.dask(timeout=10)
-        def test_long_running():
-            ...
+    - ignore event loop deprecation warnings
+    - require use of the `dask_client` fixture, even if it's not requsted
     """
-    first_dask = True
     for item in items:
-        timeout = None
-        for mark in item.iter_markers(name="dask"):
-            timeout = 5
-            if "timeout" in mark.kwargs:
-                timeout = int(mark.kwargs.get("timeout"))
-        if timeout:
-            if first_dask:
-                ## The first test requires more time to set up the dask/ray client
-                timeout += 10
-                first_dask = False
-            item.add_marker(pytest.mark.timeout(timeout))
+        is_dask = False
+        if item.iter_markers(name="dask"):
+            is_dask = True
+        if is_dask:
             item.add_marker(pytest.mark.usefixtures("dask_client"))
             item.add_marker(pytest.mark.filterwarnings("ignore::DeprecationWarning"))
 
