@@ -1,4 +1,4 @@
-git+https://github.com/astronomy-commons/hats.git@sandro/assoc-catalogs
+git+https://github.com/astronomy-commons/hats.git@main
 git+https://github.com/astronomy-commons/hats-import.git@main
-git+https://github.com/astronomy-commons/lsdb.git@sandro/join-through-xmatch-association
+git+https://github.com/astronomy-commons/lsdb.git@main
 git+https://github.com/macauff/macauff.git@main
