@@ -4,65 +4,51 @@ from lsdb.core.crossmatch.abstract_crossmatch_algorithm import AbstractCrossmatc
 from lsdb_macauff.all_macauff_attrs import AllMacauffAttrs
 from lsdb_macauff.config.pixel_params import PixelParams
 
+from lsdb.catalog import Catalog
+from lsdb_macauff.macauff_matching import MacauffMatching
+import numpy as np
+
+from hats.pixel_math.healpix_pixel import HealpixPixel
+
 # from macauff.macauff import Macauff
 
 
 class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
     """Class that runs the Macauff crossmatch"""
 
-    # pylint: disable=arguments-differ
-    def crossmatch(
-        self,
-        joint_all_sky_params,
-        left_all_sky_params,
-        right_all_sky_params,
-        left_tri_map_histogram,
-        right_tri_map_histogram,
-    ) -> pd.DataFrame:
-        # Calculate macauff pixel params using self.left_order,
-        # self.left_pixel, self.right_order, self.right_pixel
-        macauff_pixel_params = None
-        left_pixel_params = PixelParams(self.left_order, self.left_pixel, left_tri_map_histogram)
-        right_pixel_params = PixelParams(self.right_order, self.right_pixel, right_tri_map_histogram)
-        all_macauff_attrs = AllMacauffAttrs(
-            joint_all_sky_params,
-            macauff_pixel_params,
-            left_all_sky_params,
-            right_all_sky_params,
-            left_pixel_params,
-            right_pixel_params,
-        )
-        # Apply astrometric corrections?
+    extra_columns = pd.DataFrame({
+            'p': pd.Series(dtype=np.float64),
+            'eta': pd.Series(dtype=np.float64),
+            'xi': pd.Series(dtype=np.float64),
+            'a_avg_cont': pd.Series(dtype=np.float64),
+            'b_avg_cont': pd.Series(dtype=np.float64),
+            'seps': pd.Series(dtype=np.float64),
+        })
 
-        # get the dataframes
-        a_astro, a_photo, a_magref = self.make_data_arrays(
-            self.left, self.left_catalog_info, left_all_sky_params
-        )
+    @classmethod
+    def validate(
+            cls,
+            left: Catalog,
+            right: Catalog,
+            macauff: MacauffMatching,
+    ):
+        super().validate(left, right)
 
-        all_macauff_attrs.a_astro = a_astro
-        all_macauff_attrs.a_photo = a_photo
-        all_macauff_attrs.a_magref = a_magref
+    def perform_crossmatch(
+            self,
+            macauff: MacauffMatching,
+    ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
+        """Perform a cross-match between the data from two HEALPix pixels
 
-        b_astro, b_photo, b_magref = self.make_data_arrays(
-            self.right, self.right_catalog_info, right_all_sky_params
-        )
+        Finds the n closest neighbors in the right catalog for each point in the left catalog that
+        are within a threshold distance by using a K-D Tree.
 
-        all_macauff_attrs.b_astro = b_astro
-        all_macauff_attrs.b_photo = b_photo
-        all_macauff_attrs.b_magref = b_magref
+        Args:
+            n_neighbors (int): The number of neighbors to find within each point.
+            radius_arcsec (float): The threshold distance in arcseconds beyond which neighbors are not added
 
-        # macauff = Macauff(all_macauff_attrs)
-        # macauff()
-        return self.make_joint_dataframe(all_macauff_attrs)
-
-    def make_data_arrays(self, data, catalog_info, params):
-        """Creates the astro, photo, and magref arrays for a given catalog's dataset."""
-        uncertainty_column = params.uncertainty_column_name
-        astro = data[[catalog_info.ra_column, catalog_info.dec_column, uncertainty_column]].to_numpy()
-        photo = data[params.filt_names].to_numpy()
-        magref = data[params.magref_column_name].to_numpy()
-        return astro, photo, magref
-
-    def make_joint_dataframe(self, macauff_attrs: AllMacauffAttrs) -> pd.DataFrame:
-        """Creates the resulting crossmatch pandas Dataframe"""
-        raise NotImplementedError()
+        Returns:
+            Indices of the matching rows from the left and right tables found from cross-matching, and a
+            datafame with the "_dist_arcsec" column with the great circle separation between the points.
+        """
+        return macauff(self.left, self.right, HealpixPixel(self.left_order, self.left_pixel), HealpixPixel(self.right_order, self.right_pixel), HealpixPixel(self.left_order, self.left_pixel) if self.left_order > self.right_order else HealpixPixel(self.right_order, self.right_pixel))
