@@ -1,16 +1,11 @@
 import pandas as pd
 from lsdb.core.crossmatch.abstract_crossmatch_algorithm import AbstractCrossmatchAlgorithm
 
-from lsdb_macauff.all_macauff_attrs import AllMacauffAttrs
-from lsdb_macauff.config.pixel_params import PixelParams
-
 from lsdb.catalog import Catalog
-from lsdb_macauff.macauff_matching import MacauffMatching
+from lsdb_macauff.macauff_setup import MacauffSetup
 import numpy as np
 
 from hats.pixel_math.healpix_pixel import HealpixPixel
-
-# from macauff.macauff import Macauff
 
 
 class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
@@ -30,13 +25,13 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             cls,
             left: Catalog,
             right: Catalog,
-            macauff: MacauffMatching,
+            macauff_setup: MacauffSetup,
     ):
         super().validate(left, right)
 
     def perform_crossmatch(
             self,
-            macauff: MacauffMatching,
+            macauff_setup: MacauffSetup,
     ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
         """Perform a cross-match between the data from two HEALPix pixels
 
@@ -51,4 +46,4 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
             Indices of the matching rows from the left and right tables found from cross-matching, and a
             datafame with the "_dist_arcsec" column with the great circle separation between the points.
         """
-        return macauff(self.left, self.right, HealpixPixel(self.left_order, self.left_pixel), HealpixPixel(self.right_order, self.right_pixel), HealpixPixel(self.left_order, self.left_pixel) if self.left_order > self.right_order else HealpixPixel(self.right_order, self.right_pixel))
+        return macauff_setup(self.left, self.right, HealpixPixel(self.left_order, self.left_pixel) if self.left_order > self.right_order else HealpixPixel(self.right_order, self.right_pixel))

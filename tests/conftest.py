@@ -1,5 +1,6 @@
 import os
 
+import lsdb
 import pytest
 from dask.distributed import Client, LocalCluster
 
@@ -14,18 +15,18 @@ def test_data_dir():
 
 
 @pytest.fixture
-def all_sky_params(test_data_dir):
-    return load_config_from_file(AllSkyParams, os.path.join(test_data_dir, "all_sky_params.yml"))
+def gaia_params_path(test_data_dir):
+    return os.path.join(test_data_dir, "gaia_params.yaml")
 
 
 @pytest.fixture
-def gaia_all_sky_params(test_data_dir):
-    return load_config_from_file(CatalogAllSkyParams, os.path.join(test_data_dir, "gaia_all_sky_params.yml"))
+def wise_params_path(test_data_dir):
+    return os.path.join(test_data_dir, "wise_params.yaml")
 
 
 @pytest.fixture
-def wise_all_sky_params(test_data_dir):
-    return load_config_from_file(CatalogAllSkyParams, os.path.join(test_data_dir, "wise_all_sky_params.yml"))
+def gaia_wise_joint_params_path(test_data_dir):
+    return os.path.join(test_data_dir, "gaia_wise_joint_params.yaml")
 
 
 @pytest.fixture
@@ -51,6 +52,16 @@ def catwise_dir(test_data_dir):
 @pytest.fixture
 def gaia_dir(test_data_dir):
     return os.path.join(test_data_dir, "gaia_hats_data")
+
+
+@pytest.fixture
+def catwise_cat(catwise_dir):
+    return lsdb.open_catalog(catwise_dir)
+
+
+@pytest.fixture
+def gaia_cat(gaia_dir):
+    return lsdb.open_catalog(gaia_dir)
 
 
 @pytest.fixture(scope="session", name="dask_client")

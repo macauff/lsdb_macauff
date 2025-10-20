@@ -1,0 +1,16 @@
+#HATS catalog
+obs_collection=catwise_cone
+dataproduct_type=object
+hats_nrows=47697
+hats_col_ra=ra
+hats_col_dec=dec
+hats_col_healpix=_healpix_29
+hats_col_healpix_order=29
+hats_npix_suffix=.parquet
+hats_skymap_order=8
+hats_max_rows=47697
+hats_builder=lsdb v0.6.8.dev3+gded5f0b87, hats v0.6.7
+hats_creation_date=2025-10-15T16:13UTC
+hats_estsize=15462
+hats_release_date=2025-08-22
+hats_version=v1.0
