@@ -1,16 +1,23 @@
-import pandas as pd
-from macauff import CrossMatch
-from cdshealpix.nested import healpix_to_skycoord
 import numpy as np
+import pandas as pd
+from cdshealpix.nested import healpix_to_skycoord
+from macauff import CrossMatch
 
 CHUNK_ID = "0"
+
 
 class MacauffSetup(CrossMatch):
     """Class that runs the Macauff matching"""
 
     def __init__(self, crossmatch_params_file_path, cat_a_params_file_path, cat_b_params_file_path):
-        super().__init__(crossmatch_params_file_path, cat_a_params_file_path, cat_b_params_file_path,
-                         resume_file_path=None, use_mpi=False, walltime=None)
+        super().__init__(
+            crossmatch_params_file_path,
+            cat_a_params_file_path,
+            cat_b_params_file_path,
+            resume_file_path=None,
+            use_mpi=False,
+            walltime=None,
+        )
 
     def _make_chunk_queue(self, completed_chunks):
         return []
@@ -35,14 +42,20 @@ class MacauffSetup(CrossMatch):
         self._process_chunk()
         left_indices = self.ac
         right_indices = self.bc
-        extra_columns = pd.DataFrame({
-            'p': self.p,
-            'eta': self.eta,
-            'xi': self.xi,
-            'a_avg_cont': self.a_avg_cont,
-            'b_avg_cont': self.b_avg_cont,
-            'seps': self.seps
-        })
+        extra_columns = pd.DataFrame(
+            {
+                "p": self.p,
+                "eta": self.eta,
+                "xi": self.xi,
+                "a_avg_cont": self.a_avg_cont,
+                "b_avg_cont": self.b_avg_cont,
+                "a_cont_f1": self.acontprob[0],
+                "a_cont_f10": self.acontprob[1],
+                "b_cont_f1": self.bcontprob[0],
+                "b_cont_f10": self.bcontprob[1],
+                "sep": self.seps,
+            }
+        )
         return left_indices, right_indices, extra_columns
 
     def _initialise_chunk(self):
@@ -62,17 +75,50 @@ class MacauffSetup(CrossMatch):
         self.chunk_id = CHUNK_ID
         healpix_center = healpix_to_skycoord(aligned_pix.pixel, aligned_pix.order)[0]
         self.cat_a_params_dict["chunk_id_list"] = np.array([self.chunk_id])
-        self.cat_a_params_dict["auf_region_points_per_chunk"] = np.array([[healpix_center.ra.deg, healpix_center.ra.deg, 1., healpix_center.dec.deg, healpix_center.dec.deg, 1.]])
+        self.cat_a_params_dict["auf_region_points_per_chunk"] = np.array(
+            [
+                [
+                    healpix_center.ra.deg,
+                    healpix_center.ra.deg,
+                    1.0,
+                    healpix_center.dec.deg,
+                    healpix_center.dec.deg,
+                    1.0,
+                ]
+            ]
+        )
         self.cat_b_params_dict["chunk_id_list"] = np.array([self.chunk_id])
-        self.cat_b_params_dict["auf_region_points_per_chunk"] = np.array([[healpix_center.ra.deg, healpix_center.ra.deg, 1., healpix_center.dec.deg, healpix_center.dec.deg, 1.]])
+        self.cat_b_params_dict["auf_region_points_per_chunk"] = np.array(
+            [
+                [
+                    healpix_center.ra.deg,
+                    healpix_center.ra.deg,
+                    1.0,
+                    healpix_center.dec.deg,
+                    healpix_center.dec.deg,
+                    1.0,
+                ]
+            ]
+        )
         self.crossmatch_params_dict["chunk_id_list"] = np.array([self.chunk_id])
-        self.crossmatch_params_dict["cf_region_points_per_chunk"] = np.array([[healpix_center.ra.deg, healpix_center.ra.deg, 1., healpix_center.dec.deg, healpix_center.dec.deg, 1.]])
+        self.crossmatch_params_dict["cf_region_points_per_chunk"] = np.array(
+            [
+                [
+                    healpix_center.ra.deg,
+                    healpix_center.ra.deg,
+                    1.0,
+                    healpix_center.dec.deg,
+                    healpix_center.dec.deg,
+                    1.0,
+                ]
+            ]
+        )
 
     def _load_metadata_config(self, chunk_id):
         self._load_metadata_config_params(chunk_id)
 
     def _postprocess_chunk(self):
-        '''
+        """
         Runs the post-processing stage, resolving duplicate cross-matches and
         optionally creating output .csv files for use elsewhere.
 
@@ -81,21 +127,21 @@ class MacauffSetup(CrossMatch):
         divide is defined by the ``in_chunk_overlap`` array; if only a singular
         chunk is being matched (i.e., there is no compartmentalisation of a
         larger region), then ``in_chunk_overlap`` should all be set to ``False``.
-        '''
+        """
         if self.include_phot_like and self.with_and_without_photometry:
             # loop_array_extensions = ['', '_without_photometry']
-            loop_array_extensions = ['']
+            loop_array_extensions = [""]
         else:
-            loop_array_extensions = ['']
+            loop_array_extensions = [""]
 
         for file_extension in loop_array_extensions:
-            self.ac = getattr(self, f'ac{file_extension}')
-            self.bc = getattr(self, f'bc{file_extension}')
-            self.p = getattr(self, f'pc{file_extension}')
-            self.eta = getattr(self, f'eta{file_extension}')
-            self.xi = getattr(self, f'xi{file_extension}')
-            self.a_avg_cont = getattr(self, f'acontamflux{file_extension}')
-            self.b_avg_cont = getattr(self, f'bcontamflux{file_extension}')
-            self.acontprob = getattr(self, f'pacontam{file_extension}')
-            self.bcontprob = getattr(self, f'pbcontam{file_extension}')
-            self.seps = getattr(self, f'crptseps{file_extension}')
+            self.ac = getattr(self, f"ac{file_extension}")
+            self.bc = getattr(self, f"bc{file_extension}")
+            self.p = getattr(self, f"pc{file_extension}")
+            self.eta = getattr(self, f"eta{file_extension}")
+            self.xi = getattr(self, f"xi{file_extension}")
+            self.a_avg_cont = getattr(self, f"acontamflux{file_extension}")
+            self.b_avg_cont = getattr(self, f"bcontamflux{file_extension}")
+            self.acontprob = getattr(self, f"pacontam{file_extension}")
+            self.bcontprob = getattr(self, f"pbcontam{file_extension}")
+            self.seps = getattr(self, f"crptseps{file_extension}")

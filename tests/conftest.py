@@ -1,10 +1,9 @@
 import os
 
 import lsdb
+import pandas as pd
 import pytest
 from dask.distributed import Client, LocalCluster
-
-from lsdb_macauff.config import AllSkyParams, CatalogAllSkyParams, load_config_from_file
 
 # pylint: disable=missing-function-docstring, redefined-outer-name
 
@@ -62,6 +61,11 @@ def catwise_cat(catwise_dir):
 @pytest.fixture
 def gaia_cat(gaia_dir):
     return lsdb.open_catalog(gaia_dir)
+
+
+@pytest.fixture
+def expected_gaia_wise_xmatch_df(test_data_dir):
+    return pd.read_csv(os.path.join(test_data_dir, "gaiadr3_catwise_matches_0.csv"), dtype_backend="pyarrow")
 
 
 @pytest.fixture(scope="session", name="dask_client")
