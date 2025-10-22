@@ -1,7 +1,7 @@
-cat_csv_file_path: /Users/smcmu/code/lsdb_macauff/test_data/catwise_cone_chunk_{}.csv
+cat_csv_file_path: catalog_b.csv
 cat_name: CatWISE
 filt_names: [W1, W2]
-auf_file_path: /Users/smcmu/code/lsdb_macauff/test_data/wise_trilegal_simulation_{}.dat
+auf_file_path: None
 auf_region_type: rectangle
 auf_region_frame: equatorial
 correct_astrometry: False
@@ -59,8 +59,6 @@ use_photometric_uncertainties: False
 mn_fit_type: quadratic
 seeing_ranges: [3.93]
 
-auf_region_points_per_chunk:
-  - [180.00, 180.00, 1, -87.49, -87.49, 1]
+auf_region_points_per_chunk: []
 
-chunk_id_list:
-  - "0"
+chunk_id_list: []

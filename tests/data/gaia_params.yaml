@@ -1,7 +1,7 @@
-cat_csv_file_path: /Users/smcmu/code/lsdb_macauff/test_data/gaia_cone_chunk_{}.csv
+cat_csv_file_path: catalog_a.csv
 cat_name: Gaia
 filt_names: [G_BP, G, G_RP]
-auf_file_path: /Users/smcmu/code/lsdb_macauff/test_data/gaia_trilegal_simulation_{}.dat
+auf_file_path: None
 auf_region_type: rectangle
 auf_region_frame: equatorial
 correct_astrometry: False
@@ -50,8 +50,5 @@ tri_model_mags_interval_location: None
 tri_model_mags_uncert_location: None
 tri_n_bright_sources_star_location: None
 
-auf_region_points_per_chunk:
-  - [180.00, 180.00, 1, -87.49, -87.49, 1]
-
-chunk_id_list:
-  - "0"
+auf_region_points_per_chunk: []
+chunk_id_list: []
