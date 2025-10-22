@@ -10,7 +10,7 @@ real_hankel_points: 9999
 four_hankel_points: 10000
 four_max_rho: 100
 int_fracs: [0.63, 0.9, 0.999]
-n_pool: 18
+n_pool: 1
 
 make_output_csv: False
 
