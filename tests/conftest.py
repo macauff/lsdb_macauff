@@ -44,23 +44,33 @@ def counterpart_csv(test_data_dir):
 
 
 @pytest.fixture
-def catwise_dir(test_data_dir):
+def catwise_collection_dir(test_data_dir):
     return os.path.join(test_data_dir, "catwise_hats_data")
 
 
 @pytest.fixture
-def gaia_dir(test_data_dir):
+def catwise_dir(catwise_collection_dir):
+    return os.path.join(catwise_collection_dir, "catwise_cone")
+
+
+@pytest.fixture
+def gaia_collection_dir(test_data_dir):
     return os.path.join(test_data_dir, "gaia_hats_data")
 
 
 @pytest.fixture
-def catwise_cat(catwise_dir):
-    return lsdb.open_catalog(catwise_dir)
+def gaia_dir(gaia_collection_dir):
+    return os.path.join(gaia_collection_dir, "gaia_cone")
 
 
 @pytest.fixture
-def gaia_cat(gaia_dir):
-    return lsdb.open_catalog(gaia_dir)
+def catwise_cat(catwise_collection_dir):
+    return lsdb.open_catalog(catwise_collection_dir)
+
+
+@pytest.fixture
+def gaia_cat(gaia_collection_dir):
+    return lsdb.open_catalog(gaia_collection_dir)
 
 
 @pytest.fixture
