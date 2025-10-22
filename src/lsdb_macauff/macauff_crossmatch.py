@@ -31,13 +31,15 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         cls,
         left: Catalog,
         right: Catalog,
-        macauff_setup: MacauffSetup,
+        macauff_setup: MacauffSetup = None,
     ):
+        if macauff_setup is None:
+            raise ValueError("macauff_setup must be provided.")
         super().validate(left, right)
 
     def perform_crossmatch(
         self,
-        macauff_setup: MacauffSetup,
+        macauff_setup: MacauffSetup = None,
     ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
         """Perform a cross-match between the data from two HEALPix pixels
 
@@ -55,9 +57,11 @@ class MacauffCrossmatch(AbstractCrossmatchAlgorithm):
         l_inds, r_inds, extra_cols = macauff_setup(
             self.left,
             self.right,
-            HealpixPixel(self.left_order, self.left_pixel)
-            if self.left_order > self.right_order
-            else HealpixPixel(self.right_order, self.right_pixel),
+            (
+                HealpixPixel(self.left_order, self.left_pixel)
+                if self.left_order > self.right_order
+                else HealpixPixel(self.right_order, self.right_pixel)
+            ),
         )
         extra_cols = extra_cols.convert_dtypes(dtype_backend="pyarrow", convert_integer=False)
         return l_inds, r_inds, extra_cols

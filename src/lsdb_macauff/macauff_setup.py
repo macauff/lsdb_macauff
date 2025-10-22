@@ -6,6 +6,7 @@ from macauff import CrossMatch
 CHUNK_ID = "0"
 
 
+# pylint: disable=too-many-instance-attributes, no-member, attribute-defined-outside-init
 class MacauffSetup(CrossMatch):
     """Class that runs the Macauff matching"""
 
@@ -18,19 +19,19 @@ class MacauffSetup(CrossMatch):
             use_mpi=False,
             walltime=None,
         )
+        self.validate_params()
 
     def _make_chunk_queue(self, completed_chunks):
         return []
 
-    def read_metadata(self):
-        joint_config, cat_a_config, cat_b_config = super().read_metadata()
-        if joint_config["include_perturb_auf"]:
+    def validate_params(self):
+        """Validate that the parameters provided are compatible with this implementation."""
+        if self.crossmatch_params_dict["include_perturb_auf"]:
             raise NotImplementedError("Perturbations are not implemented in this version.")
-        if cat_a_config["correct_astrometry"]:
+        if self.cat_a_params_dict["correct_astrometry"]:
             raise NotImplementedError("Astrometric corrections are not implemented in this version.")
-        if cat_b_config["correct_astrometry"]:
+        if self.cat_b_params_dict["correct_astrometry"]:
             raise NotImplementedError("Astrometric corrections are not implemented in this version.")
-        return joint_config, cat_a_config, cat_b_config
 
     def __call__(self, left_partition=None, right_partition=None, aligned_pix=None):
         if left_partition is None or right_partition is None or aligned_pix is None:
