@@ -16,6 +16,7 @@ def test_macauff_setup_loading(gaia_params_path, wise_params_path, gaia_wise_joi
     npt.assert_equal(lsdb_macauff_setup.cat_b_params_dict, macauff_crossmatch.cat_b_params_dict)
 
 
+# pylint: disable=unused-argument
 def test_macauff_xmatch(
     gaia_cat,
     catwise_cat,
