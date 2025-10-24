@@ -23,6 +23,7 @@ def test_macauff_xmatch(
     wise_params_path,
     gaia_wise_joint_params_path,
     expected_gaia_wise_xmatch_df,
+    dask_client,
 ):
     macauff_setup = MacauffSetup(gaia_wise_joint_params_path, gaia_params_path, wise_params_path)
     xmatch = gaia_cat.crossmatch(
