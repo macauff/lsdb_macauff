@@ -1,0 +1,64 @@
+cat_csv_file_path: catalog_b.csv
+cat_name: CatWISE
+filt_names: [W1, W2]
+auf_file_path: None
+auf_region_type: rectangle
+auf_region_frame: equatorial
+correct_astrometry: False
+
+pos_and_err_indices: [2, 3, 4]
+mag_indices: [5, 6]
+snr_indices: [8, 9]
+chunk_overlap_col: 10
+best_mag_index_col: 7
+csv_has_header: False
+
+apply_proper_motion: False
+
+fit_gal_flag: True
+run_fw_auf: True
+run_psf_auf: True
+psf_fwhms: [6.08, 6.84]
+download_tri: False
+tri_set_name: 2mass_spitzer_wise
+tri_filt_names: [W1, W2]
+tri_filt_num: 11
+tri_maglim_faint: 32
+tri_num_faint: 1500000
+dens_dist: 0.25
+gal_wavs: [3.3526, 4.6027]
+gal_zmax: [4, 4]
+gal_nzs: [41, 41]
+gal_aboffsets: [2.699, 3.339]
+gal_filternames: [wise2010-W1, wise2010-W2]
+gal_al_avs: [0.039, 0.026]
+saturation_magnitudes: [0, 0]
+
+cat_col_names: [Cntr, Desig., RA, Dec, W1, W2]
+cat_col_nums: [0, 1, 2, 3, 5, 6]
+extra_col_names: None
+extra_col_nums: None
+
+correct_astro_mag_indices_index: 0
+nn_radius: 30
+ref_apply_proper_motion: False
+correct_mag_array: [[7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5]]
+correct_mag_slice: [[0.03, 0.03, 0.03, 0.03, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]]
+correct_sig_slice: [[0.04, 0.04, 0.04, 0.03, 0.03, 0.03, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02]]
+
+
+dens_hist_tri_location: None
+tri_dens_uncert_location: None
+tri_model_mags_location: None
+tri_model_mag_mids_location: None
+tri_model_mags_interval_location: None
+tri_model_mags_uncert_location: None
+tri_n_bright_sources_star_location: None
+
+use_photometric_uncertainties: False
+mn_fit_type: quadratic
+seeing_ranges: [3.93]
+
+auf_region_points_per_chunk: []
+
+chunk_id_list: []

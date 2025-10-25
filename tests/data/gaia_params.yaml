@@ -1,0 +1,54 @@
+cat_csv_file_path: catalog_a.csv
+cat_name: Gaia
+filt_names: [G_BP, G, G_RP]
+auf_file_path: None
+auf_region_type: rectangle
+auf_region_frame: equatorial
+correct_astrometry: False
+
+pos_and_err_indices: [2, 3, 4]
+mag_indices: [5, 6, 7]
+snr_indices: [9, 10, 11]
+chunk_overlap_col: 15
+best_mag_index_col: 8
+csv_has_header: False
+
+apply_proper_motion: False
+pm_indices: [12, 13]
+ref_epoch_or_index: "J2016.0"
+
+fit_gal_flag: True
+run_fw_auf: True
+run_psf_auf: True
+psf_fwhms: [0.12, 0.12, 0.12]
+download_tri: False
+
+tri_set_name: gaiaEDR3
+tri_filt_names: [G_BP, G, G_RP]
+tri_filt_num: 1
+tri_maglim_faint: 32
+tri_num_faint: 1500000
+dens_dist: 0.25
+gal_wavs: [0.518, 0.639, 0.782]
+gal_zmax: [4, 4, 4]
+gal_nzs: [41, 41, 41]
+gal_aboffsets: [0.0155, 0.1136, 0.3561]
+gal_filternames: [gaiadr2-BP, gaiadr2-G, gaiadr2-RP]
+gal_al_avs: [1.002, 0.789, 0.589]
+saturation_magnitudes: [0, 0, 0]
+
+cat_col_names: [ID, Desig., RA, Dec, BP, G, RP]
+cat_col_nums: [0, 1, 2, 3, 5, 6, 7]
+extra_col_names: None
+extra_col_nums: None
+
+dens_hist_tri_location: None
+tri_dens_uncert_location: None
+tri_model_mags_location: None
+tri_model_mag_mids_location: None
+tri_model_mags_interval_location: None
+tri_model_mags_uncert_location: None
+tri_n_bright_sources_star_location: None
+
+auf_region_points_per_chunk: []
+chunk_id_list: []
