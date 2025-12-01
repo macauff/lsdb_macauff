@@ -7,7 +7,7 @@ from lsdb.core.crossmatch.abstract_crossmatch_algorithm import AbstractCrossmatc
 from lsdb.core.crossmatch.crossmatch_args import CrossmatchArgs
 from macauff import CrossMatch
 
-
+# pylint: disable=too-many-instance-attributes, no-member, attribute-defined-outside-init
 class MacauffCrossmatch(AbstractCrossmatchAlgorithm, CrossMatch):
     """Class that runs the Macauff crossmatch"""
 
