@@ -3,17 +3,16 @@ import pandas as pd
 from macauff import CrossMatch
 
 from lsdb_macauff.macauff_crossmatch import MacauffCrossmatch
-from lsdb_macauff.macauff_setup import MacauffSetup
 
 
 def test_macauff_setup_loading(gaia_params_path, wise_params_path, gaia_wise_joint_params_path):
-    lsdb_macauff_setup = MacauffSetup(gaia_wise_joint_params_path, gaia_params_path, wise_params_path)
+    lsdb_macauff = MacauffCrossmatch(gaia_wise_joint_params_path, gaia_params_path, wise_params_path)
     macauff_crossmatch = CrossMatch(
         gaia_wise_joint_params_path, gaia_params_path, wise_params_path, use_mpi=False
     )
-    npt.assert_equal(lsdb_macauff_setup.crossmatch_params_dict, macauff_crossmatch.crossmatch_params_dict)
-    npt.assert_equal(lsdb_macauff_setup.cat_a_params_dict, macauff_crossmatch.cat_a_params_dict)
-    npt.assert_equal(lsdb_macauff_setup.cat_b_params_dict, macauff_crossmatch.cat_b_params_dict)
+    npt.assert_equal(lsdb_macauff.crossmatch_params_dict, macauff_crossmatch.crossmatch_params_dict)
+    npt.assert_equal(lsdb_macauff.cat_a_params_dict, macauff_crossmatch.cat_a_params_dict)
+    npt.assert_equal(lsdb_macauff.cat_b_params_dict, macauff_crossmatch.cat_b_params_dict)
 
 
 # pylint: disable=unused-argument
@@ -26,10 +25,8 @@ def test_macauff_xmatch(
     expected_gaia_wise_xmatch_df,
     dask_client,
 ):
-    macauff_setup = MacauffSetup(gaia_wise_joint_params_path, gaia_params_path, wise_params_path)
-    xmatch = gaia_cat.crossmatch(
-        catwise_cat, algorithm=MacauffCrossmatch, macauff_setup=macauff_setup, suffixes=("_gaia", "_wise")
-    )
+    macauff_algo = MacauffCrossmatch(gaia_wise_joint_params_path, gaia_params_path, wise_params_path)
+    xmatch = gaia_cat.crossmatch(catwise_cat, algorithm=macauff_algo, suffixes=("_gaia", "_wise"))
     result = xmatch.compute()
     test_df = result.sort_values(by="source_id_gaia").reset_index(drop=True)[
         expected_gaia_wise_xmatch_df.columns
